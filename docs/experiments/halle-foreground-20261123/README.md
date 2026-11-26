@@ -30,7 +30,7 @@ Far-player job `20261123T120635Z-5a1a9720` completed on an exclusive RTX 6000 Ad
 
 320-wide AV1 job `20261123T120312Z-df65f3ac` completed. At 13.985 kbps its source-mask player DISTS is 0.54196 over 480 player-ticks, with near 0.55881 and far 0.52511. [Full score](av1-320-score.json) The 640-wide AV1 and DCVC Q24 jobs `20261123T120312Z-9e113ec9` and `20261123T120312Z-7554c51e` failed at smoke validation on gpu1. Each 24-frame worker returned zero but took 356.9 and 345.8 seconds wall respectively, so the existing extrapolation gate must be diagnosed using the validation receipt and host contention before attempting a revised stage. Their failed smokes provide no full-body score. Preserve the archive and use physical native comparators at affordable prices and identical supports for any eventual Halle joint claim. The existing 49-visible-frame DCVC ball-only score remains valid under its original support.
 
-## November 25 recovery status
+## November 25 recovery status before the successful run
 
 The [later validation ledger](../tomm-validation-20261124/README.md#track-a1--halle--a3--a4--a6-completion-receipts)
 supersedes the earlier near-role and control status. It records six near-role
@@ -53,3 +53,12 @@ After both native role receipts are sealed, use
 `../test-joint-extension-20261122/native/seal_generation.py` and
 `../test-joint-extension-20261122/native/receiver_spec.py` to prepare the
 240-tick receiver replay and score it on the matched supports.
+
+## Completed receiver and scores
+
+The completed near-player, compositor, spatial, temporal, and pose receipts
+are indexed in the [TOMM validation ledger](../tomm-validation-20261124/README.md#verified-submission-evidence).
+The complete 240-frame native receiver is evaluated at 15.27 kbps warm on
+twelve fixed instants and separately on all 480 body observations. The
+headline baselines share its ceiling. Their achieved rates are 13.98 kbps
+for SVT-AV1 and 12.14 kbps for DCVC-UF.

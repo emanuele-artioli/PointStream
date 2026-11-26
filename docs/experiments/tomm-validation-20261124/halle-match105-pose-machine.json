@@ -1,0 +1,180 @@
+{
+  "schema": 1,
+  "device": "cpu",
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.tomm_player_pose_machine"
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.tomm_player_pose_machine",
+    "--validate"
+  ],
+  "arguments": [
+    "--event",
+    "match105",
+    "--source",
+    "{staged:source}",
+    "--features",
+    "{staged:features}",
+    "--ordinary",
+    "{staged:ordinary}",
+    "--ordinary-arm",
+    "av1-320-250",
+    "--roi",
+    "{staged:ordinary}",
+    "--roi-arm",
+    "av1-640-280",
+    "--neural",
+    "{staged:neural}",
+    "--neural-arm",
+    "dcvc-480-q24",
+    "--witness",
+    "{staged:witness}",
+    "--joint-arm",
+    "joint-crf50",
+    "--sender",
+    "{staged:sender}",
+    "--carrier",
+    "{staged:carrier}",
+    "--carrier-sha256",
+    "5661e7d08c90053ad49738ab3e66beee944cb4d7133d549d2af1de6de8d66de8",
+    "--yolo26x",
+    "{staged:yolo26x}",
+    "--yolo26l",
+    "{staged:yolo26l}",
+    "--frames",
+    "{frames}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "source",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match105-000-a518fd085078.mp4",
+      "sha256": "a518fd0850781642b2233cb1a8e0d910f253952f0d9d3d206326ce8d35ad0d0c",
+      "extract": false
+    },
+    {
+      "name": "features",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T113332Z-80cf4344/full/published.tar",
+      "sha256": "3de9a20e1f2bb2040e738e8c36abd69114ff18b8fb82ce34fd4319d3d05adde2",
+      "extract": false
+    },
+    {
+      "name": "ordinary",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T102101Z-db304a5b/full/published.tar",
+      "sha256": "874da9840c0cbe49b4ba1d450fbaa2a58b316130b7cbe08bc0f9fad9b641918e",
+      "extract": false
+    },
+    {
+      "name": "neural",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T093615Z-3288fdad/full/published.tar",
+      "sha256": "13e1f236b801034c31ab665ee4a2a28ff368d3bec0efe3311b21079f97f57517",
+      "extract": false
+    },
+    {
+      "name": "witness",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261125T134808Z-6caa0351/full/published.tar",
+      "sha256": "26bddfb0fdb104668c74d6d4082d6040066e4b80dd9cd75c288ba30d8e0d16fc",
+      "extract": true
+    },
+    {
+      "name": "sender",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T115652Z-1c5a006d/full/sender-result.json",
+      "sha256": "a7125bd4140889c8f376f23ef245326498eef45ff9ba0d13807161de0bb02188",
+      "extract": false
+    },
+    {
+      "name": "carrier",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T115652Z-1c5a006d/full/crf50-players.pscp",
+      "sha256": "5661e7d08c90053ad49738ab3e66beee944cb4d7133d549d2af1de6de8d66de8",
+      "extract": false
+    },
+    {
+      "name": "yolo26x",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolo26x-pose.pt",
+      "sha256": "08ed9e01d22a6f248b04f2f9992016aca9a32250b9ab57057d886a09d026700d",
+      "extract": false
+    },
+    {
+      "name": "yolo26l",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolo26l-pose.pt",
+      "sha256": "ad33da8a29ea5772318c4c980844e47b56792d2b63815ad4e8e09c078c7d1abf",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match105-000-a518fd085078.mp4",
+      "sha256": "a518fd0850781642b2233cb1a8e0d910f253952f0d9d3d206326ce8d35ad0d0c"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T113332Z-80cf4344/full/published.tar",
+      "sha256": "3de9a20e1f2bb2040e738e8c36abd69114ff18b8fb82ce34fd4319d3d05adde2"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T102101Z-db304a5b/full/published.tar",
+      "sha256": "874da9840c0cbe49b4ba1d450fbaa2a58b316130b7cbe08bc0f9fad9b641918e"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T093615Z-3288fdad/full/published.tar",
+      "sha256": "13e1f236b801034c31ab665ee4a2a28ff368d3bec0efe3311b21079f97f57517"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261125T134808Z-6caa0351/full/published.tar",
+      "sha256": "26bddfb0fdb104668c74d6d4082d6040066e4b80dd9cd75c288ba30d8e0d16fc"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T115652Z-1c5a006d/full/sender-result.json",
+      "sha256": "a7125bd4140889c8f376f23ef245326498eef45ff9ba0d13807161de0bb02188"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T115652Z-1c5a006d/full/crf50-players.pscp",
+      "sha256": "5661e7d08c90053ad49738ab3e66beee944cb4d7133d549d2af1de6de8d66de8"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolo26x-pose.pt",
+      "sha256": "08ed9e01d22a6f248b04f2f9992016aca9a32250b9ab57057d886a09d026700d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolo26l-pose.pt",
+      "sha256": "ad33da8a29ea5772318c4c980844e47b56792d2b63815ad4e8e09c078c7d1abf"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "deadline": "2026-11-26T12:00:00Z",
+  "verify_staged_inputs": true,
+  "hosts": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu4",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 36,
+  "smoke": {
+    "seconds": 360,
+    "representative_basis": "Four uniformly spaced Halle 25-fps frames checking YOLO26x vs YOLO26l source agreement and decoding av1-320-250, av1-640-280, dcvc-480-q24, joint-crf50, and direct joints."
+  },
+  "full": {
+    "seconds": 2200
+  },
+  "validator_seconds": 30,
+  "budget_seconds": 2700,
+  "stall_seconds": 600,
+  "scale": {
+    "frames": {
+      "smoke": 4,
+      "full": 48
+    }
+  }
+}

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Redraw the external rate ladders and aggregate the twelve-match ball table.
+set -euo pipefail
+
+if [[ $# -ne 1 ]]; then
+    printf 'Usage: %s NEW_OUTPUT_DIRECTORY\n' "${0##*/}" >&2
+    exit 2
+fi
+
+output_dir=$1
+mkdir -- "$output_dir"
+output_dir=$(cd "$output_dir" && pwd)
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+joint_card=docs/experiments/joint-operating-range-20261123
+shanghai_card=docs/experiments/shanghai-wider-20261123
+ball_card=docs/experiments/ball-metric-suite-20261123
+
+export MPLBACKEND=Agg
+PYTHONPATH=. python "$joint_card/compare.py" "$output_dir/joint" \
+    --shanghai-wider "$shanghai_card/q23-metrics.json" "$shanghai_card/q17-metrics.json" "$shanghai_card/q640-metrics.json" \
+    --ordinary "$joint_card"/ordinary-*.json --roi "$joint_card"/foreground-roi-*.json
+python "$ball_card/summarize.py" "$output_dir/ball-metric-summary.json" "$ball_card"/match*-result.json
