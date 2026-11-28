@@ -89,6 +89,13 @@ def _install_shims_and_sdpa_patch(wan_code_root: Path) -> dict[str, Any]:
     if str(wan_code_root) not in sys.path:
         sys.path.insert(0, str(wan_code_root))
 
+    # Avoid executing wan/__init__.py which eagerly imports speech2video (librosa)
+    if "wan" not in sys.modules:
+        wan_pkg = types.ModuleType("wan")
+        wan_pkg.__path__ = [str(wan_code_root / "wan")]
+        wan_pkg.__spec__ = importlib.machinery.ModuleSpec("wan", None, is_package=True)
+        sys.modules["wan"] = wan_pkg
+
     import wan.modules.animate.face_blocks as face_blocks_mod
     import wan.modules.animate.model_animate as model_animate_mod
     import wan.modules.attention as attn_mod
