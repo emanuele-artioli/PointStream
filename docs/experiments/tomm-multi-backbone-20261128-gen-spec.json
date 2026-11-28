@@ -248,7 +248,7 @@
     "policy": "continue",
     "basis": "Exclusive RTX 6000 Ada generation for uncontaminated pinned-GPU timing of multi-backbone ablation"
   },
-  "cpu_threads": 2,
+  "cpu_threads": 1,
   "single_cpu_campaign": true,
   "local_storage_gib": 36,
   "smoke": {
