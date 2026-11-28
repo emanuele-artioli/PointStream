@@ -38,12 +38,14 @@ WAN_DEFAULT_NEG_PROMPT = (
 
 def _install_shims_and_sdpa_patch(wan_code_root: Path) -> dict[str, Any]:
     """Install lightweight shims (decord, easydict) and patch Wan attention to Flash SDPA."""
+    import importlib.machinery
     import torch
     import torch.nn.functional as F
     from torch.nn.attention import SDPBackend, sdpa_kernel
 
     if "decord" not in sys.modules:
         decord_mod = types.ModuleType("decord")
+        decord_mod.__spec__ = importlib.machinery.ModuleSpec("decord", None)
 
         class _DummyVideoReader:
             def __init__(self, *_a: Any, **_kw: Any) -> None:
@@ -54,6 +56,7 @@ def _install_shims_and_sdpa_patch(wan_code_root: Path) -> dict[str, Any]:
 
     if "easydict" not in sys.modules:
         ed_mod = types.ModuleType("easydict")
+        ed_mod.__spec__ = importlib.machinery.ModuleSpec("easydict", None)
 
         class EasyDict(dict[str, Any]):
             def __init__(self, d: dict[str, Any] | None = None, **kwargs: Any) -> None:
