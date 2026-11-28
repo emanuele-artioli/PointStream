@@ -34,4 +34,5 @@
 
 | Stage | Job ID | Host | Status | Notes |
 |---|---|---|---|---|
-| Stage 1 (48f pilot) | _pending_ | CPU | — | `experiments.tennis.tomm_warp_v2_pilot` |
+| Stage 1 (48f pilot) | `20261128T040442Z-ee9d0597` | `gpu6` (CPU) | `failed` (smoke) | Determinism check caught unseeded `cv2.grabCut` RNG; fixed with `cv2.setRNGSeed(0)` |
+| Stage 1 (48f pilot, retry) | _pending_ | CPU | — | `experiments.tennis.tomm_warp_v2_pilot` (seeded GrabCut) |

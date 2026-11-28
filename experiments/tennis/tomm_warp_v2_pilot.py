@@ -163,6 +163,7 @@ def extract_ref_alpha_from_base(
         bgd_model = np.zeros((1, 65), dtype=np.float64)
         fgd_model = np.zeros((1, 65), dtype=np.float64)
         try:
+            cv2.setRNGSeed(0)
             cv2.grabCut(
                 ref_small,
                 gc_mask,
