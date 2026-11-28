@@ -188,7 +188,7 @@ def render_mimicmotion(
             max_guidance_scale=guidance_scale,
             decode_chunk_size=decode_chunk_size,
             output_type="pt",
-            device="cuda",
+            device=torch.device("cuda"),
         ).frames.cpu()
     torch.cuda.synchronize()
     render_s = time.perf_counter() - t0
