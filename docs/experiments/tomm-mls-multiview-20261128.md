@@ -1,4 +1,6 @@
-# Multi-view CPU player receiver
+# Experiments: Multi-view CPU player receiver
+
+### 2026-11-28 — Native 240-frame CPU receiver
 
 This addresses the out-of-plane turn failure in the TOMM receiver-cost comparison. The operating point is the existing 240-frame cleaned AV1 base and PSCP pose stream. The comparison holds both payloads and scoring support fixed and varies only the cold appearance cache.
 
@@ -14,4 +16,15 @@ This addresses the out-of-plane turn failure in the TOMM receiver-cost compariso
 
 ## Fleet ledger
 
-No jobs submitted.
+| Match | Fleet job | Frozen revision | Status |
+|---|---|---|---|
+| Shanghai, K=1/2/3 | `20261128T122416Z-4f6db8c2` | `c2f1863770e29612ac993367fdaea3046235ca78` | Submitted |
+
+The Shanghai deadline is 2026-11-28 18:00 UTC. The publication root is
+`/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261128T122416Z-4f6db8c2/`;
+retrieve and validate the score JSON from `smoke/` and `full/`. The committed [job specification](tomm-mls-multiview-match102-spec.json) pins the input, environment and declared resource caps.
+Snapshot SHA256 is `539ec0f4bdcaff039c974b75c3e2996a5a771cd1a5f38d9a41201c8b8e0ccf1e` with an empty worktree patch.
+The pool passed the [fleet doctor](../fleet.md#one-entry-point) using check `1920c785c6ec420b8f9079277b70ca49`.
+Archived SAM masks supply the existing scoring support. They are read by the judge, and the new receiver path never receives a matte from them.
+
+Local synthetic verification used real AVIF Q90 encode/decode, two players, all 16 frames, both added cache sizes, and a constructed orientation change. It exercised the cold binding and zero warm bytes, rejected a different carrier hash, switched views and obtained pixel max absolute difference zero. The native smoke and 240-frame job provide the broadcast measurements.

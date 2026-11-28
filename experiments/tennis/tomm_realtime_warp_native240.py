@@ -327,7 +327,7 @@ def render_arm(
                         my,
                         interpolation=cv2.INTER_LINEAR,
                         borderMode=cv2.BORDER_CONSTANT,
-                        borderValue=0.0,
+                        borderValue=(0.0,),
                     )
                     if use_warped_mask
                     else None

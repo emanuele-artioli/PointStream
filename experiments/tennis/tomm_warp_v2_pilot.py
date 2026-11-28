@@ -133,19 +133,19 @@ def extract_ref_alpha_from_base(
         if valid[ja] and valid[jb]:
             pa = (int(round(pts[ja, 0])), int(round(pts[ja, 1])))
             pb = (int(round(pts[jb, 0])), int(round(pts[jb, 1])))
-            cv2.line(skel_fg, pa, pb, 255, thickness=max(2, sw // 32))
-            cv2.line(skel_pr, pa, pb, 255, thickness=max(10, sw // 6))
+            cv2.line(skel_fg, pa, pb, (255,), thickness=max(2, sw // 32))
+            cv2.line(skel_pr, pa, pb, (255,), thickness=max(10, sw // 6))
     # Fill torso polygon if shoulders & hips are visible
     torso_idx = [5, 6, 12, 11]
     if all(valid[i] for i in torso_idx):
         poly = np.round(pts[torso_idx]).astype(np.int32)
-        cv2.fillConvexPoly(skel_fg, poly, 255)
-        cv2.fillConvexPoly(skel_pr, poly, 255)
+        cv2.fillConvexPoly(skel_fg, poly, (255,))
+        cv2.fillConvexPoly(skel_pr, poly, (255,))
     # Head circle
     if valid[0]:
         p0 = (int(round(pts[0, 0])), int(round(pts[0, 1])))
-        cv2.circle(skel_fg, p0, max(3, sw // 24), 255, -1)
-        cv2.circle(skel_pr, p0, max(10, sw // 7), 255, -1)
+        cv2.circle(skel_fg, p0, max(3, sw // 24), (255,), -1)
+        cv2.circle(skel_pr, p0, max(10, sw // 7), (255,), -1)
 
     # Build GrabCut trimap using background subtraction + skeleton prior
     gc_mask = np.full((sh, sw), cv2.GC_BGD, dtype=np.uint8)
@@ -378,7 +378,7 @@ def _paste_soft_alpha(
         (out_w, out_h),
         flags=cv2.INTER_LINEAR | cv2.WARP_INVERSE_MAP,
         borderMode=cv2.BORDER_CONSTANT,
-        borderValue=0.0,
+        borderValue=(0.0,),
     )
     a3 = warped_a[..., None]
     roi = canvas[iy0:iy1, ix0:ix1].astype(np.float32)
@@ -462,7 +462,7 @@ def render_variant(
                             my,
                             interpolation=cv2.INTER_LINEAR,
                             borderMode=cv2.BORDER_CONSTANT,
-                            borderValue=0.0,
+                            borderValue=(0.0,),
                         )
                         if use_warped_mask
                         else None
