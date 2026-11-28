@@ -103,5 +103,5 @@ Identical to `docs/experiments/tomm-multi-backbone-20261128.md` on Shanghai
 | Generation (attempt 2, failed) | `20261128T042632Z-52337146` | `gpu6` (RTX 6000 Ada) | Failed (smoke) | `transformers` checked `decord.__spec__`; added `ModuleSpec` to shims |
 | Generation (attempt 3, failed) | `20261128T043027Z-0244070d` | `gpu6` (RTX 6000 Ada) | Failed (smoke) | `wan/__init__.py` eagerly imported `speech2video` (`librosa`); bypassed via package stub |
 | Generation (attempt 4, failed) | `20261128T043508Z-31a5f8cc` | `gpu6` (RTX 6000 Ada) | Failed (smoke) | All models loaded; `wan.modules.animate.clip` bound unpatched `flash_attention`; patched |
-| Generation (16f smoke + 48f full) | pending | `gpu5`/`gpu6` (RTX 6000 Ada) | Pending | Exclusive RTX 6000 Ada |
+| Generation (16f smoke + 48f full) | `20261128T043956Z-8aa56788` | `gpu6` (RTX 6000 Ada) | Complete | Exclusive RTX 6000 Ada (`timing_contaminated=false`, 15.0 min total, peak 36.5 GiB, 4,862 Flash SDPA calls, determinism diff=0, 465.51 s render); `published.tar` sha256 `93d6edfd...` |
 | Scoring (16f smoke + 48f full) | pending | CPU | Pending | `tomm_multi_backbone_score.py` |
