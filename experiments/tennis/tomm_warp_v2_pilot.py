@@ -150,11 +150,11 @@ def extract_ref_alpha_from_base(
     # Build GrabCut trimap using background subtraction + skeleton prior
     gc_mask = np.full((sh, sw), cv2.GC_BGD, dtype=np.uint8)
     # Probable background everywhere inside dilated skeleton or moderate diff
-    gc_mask[(skel_pr > 0) | (diff > 14.0)] = cv2.GC_PR_BGD
+    gc_mask[(skel_pr > 0) | (diff > 12.0)] = cv2.GC_PR_BGD
     # Probable foreground where both near skeleton and distinct from court base
-    gc_mask[(skel_pr > 0) & (diff > 18.0)] = cv2.GC_PR_FGD
-    # Definite foreground on skeleton core that differs from base (or core torso)
-    gc_mask[(skel_fg > 0) & (diff > 10.0)] = cv2.GC_FGD
+    gc_mask[(skel_pr > 0) & (diff > 12.0)] = cv2.GC_PR_FGD
+    # Definite foreground along the thin skeleton core (prevents chopping low-contrast limbs/shoes)
+    gc_mask[skel_fg > 0] = cv2.GC_FGD
 
     # Ensure both FG and BG pixels exist before calling GrabCut
     has_fg = np.any((gc_mask == cv2.GC_FGD) | (gc_mask == cv2.GC_PR_FGD))
@@ -405,9 +405,10 @@ def render_variant(
     if use_warped_mask:
         for role in roles:
             inp = unit_inputs[role]
-            ref_kp = k6b.to_crop(inp["smooth_kp"][0], inp["boxes"][0])
+            ref_box = inp["reference_box"]
+            ref_kp = k6b.to_crop(inp["smooth_kp"][0], ref_box)
             ref_alphas[role] = extract_ref_alpha_from_base(
-                inp["ref_crop"], base_frames[0], inp["boxes"][0], ref_kp
+                inp["ref_crop"], base_frames[0], ref_box, ref_kp
             )
     matte_init_s = time.perf_counter() - t_matte0
 
@@ -418,8 +419,10 @@ def render_variant(
 
     # Precompute crop-space keypoints (lightweight geometry from decoded PSCP)
     crop_kps: dict[str, list[np.ndarray]] = {}
+    ref_kps: dict[str, np.ndarray] = {}
     for role in roles:
         inp = unit_inputs[role]
+        ref_kps[role] = k6b.to_crop(inp["smooth_kp"][0], inp["reference_box"])
         crop_kps[role] = [k6b.to_crop(inp["smooth_kp"][t], inp["boxes"][t]) for t in range(n_frames)]
 
     for t in range(n_frames):
@@ -431,7 +434,7 @@ def render_variant(
             inp = unit_inputs[role]
             ref_crop = inp["ref_crop"]
             h, w = ref_crop.shape[:2]
-            ref_kp = crop_kps[role][0]
+            ref_kp = ref_kps[role]
             dst_kp = crop_kps[role][t]
 
             tw0 = time.perf_counter()
@@ -538,10 +541,12 @@ def run_pilot(args: argparse.Namespace) -> dict[str, Any]:
             raw_kp = np.asarray(run_data["kp"][: args.frames], dtype=np.float32)
             smooth_kp = smooth_keypoints(raw_kp)
             boxes = np.asarray(run_data["boxes"][: args.frames], dtype=np.float64)
+            ref_box = np.asarray(run_data["reference_box"], dtype=np.float64)
             ref_crop = np.asarray(run_data["reference"], dtype=np.uint8)
             unit_inputs[role] = {
                 "smooth_kp": smooth_kp,
                 "boxes": boxes,
+                "reference_box": ref_box,
                 "ref_crop": ref_crop,
             }
             gt_kps[role] = smooth_kp
@@ -715,7 +720,11 @@ def run_pilot(args: argparse.Namespace) -> dict[str, Any]:
             "wall_seconds": time.monotonic() - t0,
             "variants": per_variant,
         }
-        (stage_dir / "warp_v2_pilot_scores.json").write_text(json.dumps(summary, indent=2) + "\n")
+        text = json.dumps(summary, indent=2) + "\n"
+        pub = scratch / "publish"
+        pub.mkdir(parents=True, exist_ok=True)
+        (pub / "warp_v2_pilot_scores.json").write_text(text)
+        (stage_dir / "warp_v2_pilot_scores.json").write_text(text)
         print(
             json.dumps(
                 {
@@ -746,16 +755,24 @@ def validate_stage(stage_dir: Path) -> None:
     data = json.loads((stage_dir / "warp_v2_pilot_scores.json").read_text())
     variants = data.get("variants", {})
     expected = {"v1_gauss_sam", "v2_lbs_sam", "v2_mls_sam", "v2_lbs_warped_mask", "v2_mls_warped_mask"}
-    if set(variants) != expected:
-        raise ValueError(f"missing variants: {expected - set(variants)}")
-    for k, v in variants.items():
-        for m in ("dists_mean", "lpips_mean", "psnr_mean", "self_flow_error_mean", "yolo_pose_mean_oks"):
-            val = float(v[m])
-            if not math.isfinite(val):
-                raise ValueError(f"non-finite {m} for {k}: {val}")
-        if float(v["timing"]["total_receiver_seconds"]) <= 0:
-            raise ValueError(f"invalid timing for {k}")
-    print(json.dumps({"validated": sorted(variants), "stage": data["stage"]}))
+    checks = {
+        "has_all_variants": set(variants) == expected,
+        "finite_metrics": all(
+            math.isfinite(float(v[m]))
+            for v in variants.values()
+            for m in ("dists_mean", "lpips_mean", "psnr_mean", "self_flow_error_mean", "yolo_pose_mean_oks")
+        ),
+        "positive_timing": all(
+            float(v["timing"]["total_receiver_seconds"]) > 0.0 for v in variants.values()
+        ),
+    }
+    ok = all(checks.values())
+    val_path = os.environ.get("PS_VALIDATION_PATH")
+    if val_path:
+        Path(val_path).write_text(json.dumps({"passed": ok, "checks": checks}, indent=2) + "\n")
+    if not ok:
+        raise ValueError(f"warp v2 pilot validation failed: {checks}")
+    print(json.dumps({"passed": ok, "checks": checks, "stage": data["stage"]}))
 
 
 def main(argv: list[str] | None = None) -> int:

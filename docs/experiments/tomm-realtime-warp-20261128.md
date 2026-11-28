@@ -35,4 +35,5 @@
 | Stage | Job ID | Host | Status | Notes |
 |---|---|---|---|---|
 | Stage 1 (48f pilot) | `20261128T040442Z-ee9d0597` | `gpu6` (CPU) | `failed` (smoke) | Determinism check caught unseeded `cv2.grabCut` RNG; fixed with `cv2.setRNGSeed(0)` |
-| Stage 1 (48f pilot, retry) | _pending_ | CPU | — | `experiments.tennis.tomm_warp_v2_pilot` (seeded GrabCut) |
+| Stage 1 (48f pilot, retry) | `20261128T040755Z-869c0567` | `gpu5` (CPU) | `failed` (validator) | Smoke passed & showed `v2_lbs_sam` 0.2898 / `v2_mls_sam` 0.2880 DISTS, `v2_lbs_warped_mask` 85.2 fps; missing `PS_VALIDATION_PATH` write |
+| Stage 1 (48f pilot, v2) | _pending_ | CPU | — | Fixed `PS_VALIDATION_PATH`, `reference_box` alignment, skeleton-core GrabCut |
