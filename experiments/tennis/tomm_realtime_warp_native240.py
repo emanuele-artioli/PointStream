@@ -153,10 +153,10 @@ def decode_ivf_to_canvas(
             coded_h, coded_w, 3
         )
         if coded_w != canvas_w or coded_h != canvas_h:
-            buf = cv2.resize(buf, (canvas_w, canvas_h), interpolation=cv2.INTER_CUBIC)
+            frame: np.ndarray = cv2.resize(buf, (canvas_w, canvas_h), interpolation=cv2.INTER_CUBIC)
         else:
-            buf = buf.copy()
-        frames.append(buf)
+            frame = buf.copy()
+        frames.append(frame)
     return frames, time.perf_counter() - t0
 
 
@@ -213,6 +213,8 @@ def encode_decode_psr_alpha_t0(
 
     # Receiver decodes PNG and upsamples with 1.2 px edge feather
     dec = cv2.imdecode(np.frombuffer(raw_bytes, dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
+    if dec is None:
+        raise RuntimeError("failed to PNG-decode t=0 reference mask")
     alpha = cv2.resize(dec.astype(np.float32) / 255.0, (out_w, out_h), interpolation=cv2.INTER_LINEAR)
     alpha = cv2.GaussianBlur(alpha, (5, 5), 1.2)
     return np.clip(alpha, 0.0, 1.0).astype(np.float32), len(raw_bytes)
