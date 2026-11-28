@@ -96,6 +96,8 @@ def _install_shims_and_sdpa_patch(wan_code_root: Path) -> dict[str, Any]:
         wan_pkg.__spec__ = importlib.machinery.ModuleSpec("wan", None, is_package=True)
         sys.modules["wan"] = wan_pkg
 
+    import wan.modules as modules_mod
+    import wan.modules.animate.clip as clip_mod
     import wan.modules.animate.face_blocks as face_blocks_mod
     import wan.modules.animate.model_animate as model_animate_mod
     import wan.modules.attention as attn_mod
@@ -198,8 +200,10 @@ def _install_shims_and_sdpa_patch(wan_code_root: Path) -> dict[str, Any]:
         return x.transpose(1, 2).contiguous().reshape(q.shape[0], q.shape[1], -1)
 
     attn_mod.flash_attention = sdpa_flash_attention
+    modules_mod.flash_attention = sdpa_flash_attention
     model_mod.flash_attention = sdpa_flash_attention
     model_animate_mod.flash_attention = sdpa_flash_attention
+    clip_mod.flash_attention = sdpa_flash_attention
     face_blocks_mod.attention = sdpa_face_attention
     return kernel_stats
 
