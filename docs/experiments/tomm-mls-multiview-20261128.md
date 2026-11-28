@@ -19,6 +19,7 @@ This addresses the out-of-plane turn failure in the TOMM receiver-cost compariso
 | Match | Fleet job | Frozen revision | Status |
 |---|---|---|---|
 | Shanghai, K=1/2/3 | `20261128T122416Z-4f6db8c2` | `c2f1863770e29612ac993367fdaea3046235ca78` | Smoke rejected on gpu1 |
+| Shanghai retry, K=1/2/3 | `20261128T123108Z-31ae2163` | `04d8511bbf53fe28739c78c31aab570790458b60` | Submitted to gpu5 |
 
 The Shanghai deadline is 2026-11-28 18:00 UTC. The publication root is
 `/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261128T122416Z-4f6db8c2/`;
@@ -32,3 +33,5 @@ Local synthetic verification used real AVIF Q90 encode/decode, two players, all 
 Repository-wide Ruff and mypy passed with the CI-pinned tools after switching single-channel OpenCV scalar arguments to one-element tuples. A local pixel comparison confirmed the typed call form preserved the GrabCut matte and composite output exactly. The common packet, packet finish and pose-rate tests passed. The full suite encountered an inherited experiment-card format failure on `tomm-backbone-mimicmotion-20261128.md`. The macOS process-suspension test also failed under sandbox restrictions on `ps` and passed when rerun with process inspection available.
 
 The first native smoke produced exact repeated pixels for all three arms and zero warm-byte additions. AVIF Q90 payload and total cold increments were 41,087 B and 41,552 B for K=2 and 80,373 B and 81,100 B for K=3. The validator blocked full scoring because Ultralytics changed PyTorch's thread setting to eight during the CPU judge, despite verified one-core affinity, empty CUDA visibility and no GPU claim. The retry pins the judge's thread setting and verifies it before each timed arm. It targets gpu5, the historical Shanghai timing host, and reduces the cap to 2,650 seconds to account for the failed smoke within the Shanghai campaign budget.
+
+The retry preserves the same inputs and 18:00 UTC deadline. Its snapshot SHA256 is `38a1b8c3ed0baecd64572c70bceac19537165044fb91e3fd099ee3dfcec1f755` with an empty worktree patch. Its result path is `20261128T123108Z-31ae2163/full/tomm-mls-multiview-match102-scores.json` under the fleet inbox.
