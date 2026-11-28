@@ -87,14 +87,21 @@ def best_yolo_oks(
     gt_kp: np.ndarray,
     mask_box: tuple[int, int, int, int],
 ) -> float:
+    return match_yolo_pose(detect_yolo_pose(yolo_model, frame_rgb), gt_kp, mask_box)
+
+
+def detect_yolo_pose(yolo_model: Any, frame_rgb: np.ndarray, **predict_options: Any) -> np.ndarray:
+    """Run YOLO26x-pose once per frame so multiple tracks can share its detections."""
+    results = yolo_model.predict(frame_rgb[:, :, ::-1], imgsz=1280, conf=0.15, verbose=False, **predict_options)
+    if not results or results[0].keypoints is None:
+        return np.empty((0, 17, 3))
+    return results[0].keypoints.data.cpu().numpy()
+
+
+def match_yolo_pose(kps: np.ndarray, gt_kp: np.ndarray, mask_box: tuple[int, int, int, int]) -> float:
     bx0, by0, bx1, by1 = mask_box
     area = float(max(1, (bx1 - bx0) * (by1 - by0)))
-    # Run YOLO26x-pose on the full 1080p composited frame (BGR)
-    results = yolo_model.predict(frame_rgb[:, :, ::-1], imgsz=1280, conf=0.15, verbose=False)
-    if not results or results[0].keypoints is None or len(results[0].keypoints.data) == 0:
-        return 0.0
-    kps = results[0].keypoints.data.cpu().numpy()  # (N, 17, 3)
-    return max(coco_oks(gt_kp, kps[i], area) for i in range(len(kps)))
+    return max((coco_oks(gt_kp, kp, area) for kp in kps), default=0.0)
 
 
 def discover_backbones(gen_dir: Path, roles: tuple[str, ...]) -> tuple[list[str], dict[str, Any]]:

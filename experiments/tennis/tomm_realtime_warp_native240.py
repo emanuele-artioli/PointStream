@@ -5,6 +5,8 @@ strictly on 1 CPU thread (0 GPU-hours) and evaluates three MLS-Similarity (step=
   1. mls_step8_bgsub_alpha: 0 extra wire bytes, 0 SAM, 0 GPU (t=0 matte from |ref_crop - base_0|)
   2. mls_step8_psr_alpha:   paid 1-bit t=0 PNG reference mask in PSR (+billed kbps), 0 receiver SAM, 0 GPU
   3. mls_step8_sam_oracle:  per-frame SAM 3.1 compositing mask (diagnostic upper bound for silhouette drift)
+
+--views selects the separate CPU-only K=1/2/3 cold appearance-cache comparison.
 """
 
 from __future__ import annotations
@@ -15,6 +17,7 @@ from fractions import Fraction
 import json
 import math
 import os
+import shutil
 from pathlib import Path
 from statistics import mean
 import subprocess
@@ -23,14 +26,16 @@ import tempfile
 import time
 from typing import Any
 
+from PIL import __version__ as pillow_version
+
 import cv2
 import numpy as np
 import torch
 
 from experiments.tennis import common_player_packet as packet
-from experiments.tennis import k6b
+from experiments.tennis import k6b, tomm_mls_appearance as appearance
 from experiments.tennis.player_requalification import sha256
-from experiments.tennis.tomm_multi_backbone_score import YOLO_POSE_SHA256, best_yolo_oks
+from experiments.tennis.tomm_multi_backbone_score import YOLO_POSE_SHA256, best_yolo_oks, detect_yolo_pose, match_yolo_pose
 from experiments.tennis.tomm_v5_pareto_pilot import smooth_keypoints
 from experiments.tennis.tomm_v5_score import ALEXNET_SHA256, VGG_SHA256, mask_full_res
 from experiments.tennis.tomm_warp_v2_pilot import (
@@ -137,6 +142,10 @@ def decode_ivf_to_canvas(
         str(ivf_path),
         "-frames:v",
         str(n_frames),
+        "-filter_threads",
+        "1",
+        "-threads:v",
+        "1",
         "-f",
         "rawvideo",
         "-pix_fmt",
@@ -172,6 +181,10 @@ def load_source_video(path: Path, n_frames: int, width: int = 1920, height: int 
         str(path),
         "-frames:v",
         str(n_frames),
+        "-filter_threads",
+        "1",
+        "-threads:v",
+        "1",
         "-f",
         "rawvideo",
         "-pix_fmt",
@@ -239,31 +252,48 @@ def render_arm(
     supports: Any,
     psr_alphas: dict[str, np.ndarray],
     step: int = 8,
+    extra_views: dict[str, list[tuple[int, np.ndarray]]] | None = None,
+    selection_log: dict[str, list[int]] | None = None,
 ) -> tuple[list[np.ndarray], dict[str, float]]:
     """Run one MLS-Similarity (step=8) receiver arm over all frames on 1 CPU thread."""
     n_frames = len(base_frames)
     use_warped_mask = arm != "mls_step8_sam_oracle"
 
-    t_matte0 = time.perf_counter()
-    ref_alphas: dict[str, np.ndarray] = {}
-    if arm == "mls_step8_bgsub_alpha":
-        for role in roles:
-            inp = unit_inputs[role]
-            ref_kp = k6b.to_crop(inp["smooth_kp"][0], inp["reference_box"])
-            ref_alphas[role] = extract_ref_alpha_from_base(
-                inp["ref_crop"], base_frames[0], inp["reference_box"], ref_kp
-            )
-    elif arm == "mls_step8_psr_alpha":
-        for role in roles:
-            ref_alphas[role] = psr_alphas[role]
-    matte_init_s = time.perf_counter() - t_matte0
-
-    ref_kps: dict[str, np.ndarray] = {}
-    crop_kps: dict[str, list[np.ndarray]] = {}
+    render_start = time.perf_counter()
+    ref_images: dict[str, list[np.ndarray]] = {}
+    ref_alphas: dict[str, list[np.ndarray]] = {}
+    ref_kps: dict[str, list[np.ndarray]] = {}
+    choices: dict[str, list[int]] = {}
     for role in roles:
         inp = unit_inputs[role]
-        ref_kps[role] = k6b.to_crop(inp["smooth_kp"][0], inp["reference_box"])
-        crop_kps[role] = [k6b.to_crop(inp["smooth_kp"][t], inp["boxes"][t]) for t in range(n_frames)]
+        box = inp["reference_box"]
+        pose = k6b.to_crop(inp["smooth_kp"][0], box)
+        ref_images[role] = [inp["ref_crop"]]
+        ref_kps[role] = [pose]
+        ref_alphas[role] = []
+        if arm == "mls_step8_bgsub_alpha":
+            ref_alphas[role].append(extract_ref_alpha_from_base(ref_images[role][0], base_frames[0], box, pose))
+        elif arm == "mls_step8_psr_alpha":
+            ref_alphas[role].append(psr_alphas[role])
+
+        ticks = [0]
+        if extra_views is not None:
+            for tick, image in extra_views[role]:
+                ref_box = np.asarray(k6b.int_box(inp["boxes"][tick]), dtype=np.float64)
+                ref_pose = k6b.to_crop(inp["smooth_kp"][tick], ref_box)
+                ticks.append(tick)
+                ref_images[role].append(image)
+                ref_kps[role].append(ref_pose)
+                ref_alphas[role].append(extract_ref_alpha_from_base(image, base_frames[0], ref_box, ref_pose))
+        choices[role] = appearance.view_schedule(inp["selection_kp"], ticks)[:n_frames] if extra_views else [0] * n_frames
+    matte_init_s = time.perf_counter() - render_start
+    if selection_log is not None:
+        selection_log.update(choices)
+
+    crop_kps = {
+        role: [k6b.to_crop(unit_inputs[role]["smooth_kp"][t], unit_inputs[role]["boxes"][t]) for t in range(n_frames)]
+        for role in roles
+    }
 
     canvases: list[np.ndarray] = []
     warp_s = 0.0
@@ -276,14 +306,15 @@ def render_arm(
 
         for role in reversed(roles):
             inp = unit_inputs[role]
-            ref_crop = inp["ref_crop"]
+            slot = choices[role][t]
+            ref_crop = ref_images[role][slot]
             h, w = ref_crop.shape[:2]
 
             tw0 = time.perf_counter()
-            maps = compute_mls_similarity_maps_step(h, w, ref_kps[role], crop_kps[role][t], step=step)
+            maps = compute_mls_similarity_maps_step(h, w, ref_kps[role][slot], crop_kps[role][t], step=step)
             if maps is None:
                 warped_rgb = ref_crop.copy()
-                warped_alpha = ref_alphas[role].copy() if use_warped_mask else None
+                warped_alpha = ref_alphas[role][slot].copy() if use_warped_mask else None
             else:
                 mx, my = maps
                 warped_rgb = cv2.remap(
@@ -291,7 +322,7 @@ def render_arm(
                 )
                 warped_alpha = (
                     cv2.remap(
-                        ref_alphas[role],
+                        ref_alphas[role][slot],
                         mx,
                         my,
                         interpolation=cv2.INTER_LINEAR,
@@ -314,7 +345,7 @@ def render_arm(
 
         canvases.append(canvas)
 
-    synth_total_s = matte_init_s + warp_s + comp_s
+    synth_total_s = time.perf_counter() - render_start
     return canvases, {
         "matte_init_seconds": matte_init_s,
         "warp_seconds": warp_s,
@@ -330,7 +361,10 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
     stage_name = os.environ["PS_STAGE"]
     stage_dir = Path(os.environ["PS_STAGE_DIR"])
     scratch = Path(os.environ["PS_SCRATCH_DIR"])
-    expected_frames = {"smoke": 24, "full": 240}[stage_name]
+    multiview = args.views is not None
+    expected_frames = {"smoke": 16 if multiview else 24, "full": 240}[stage_name]
+    if multiview and hasattr(os, "sched_getaffinity") and len(os.sched_getaffinity(0)) != 1:
+        raise RuntimeError("multi-view benchmark requires one pinned CPU")
     if args.frames != expected_frames:
         raise ValueError(f"frames={args.frames} mismatches stage {stage_name}")
 
@@ -347,9 +381,11 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
     supports, support_hash = get_support(args.features, receipt=receipt_path)
 
     carrier_bytes = args.carrier.read_bytes()
-    info = packet.inspect(carrier_bytes)
-    profile = info["profile"]
+    unpack_start = time.perf_counter()
+    profile = packet._embedded_profile(carrier_bytes)
     sections, accounting, decoded = packet.unpack(carrier_bytes, profile)
+    carrier_decode_s = time.perf_counter() - unpack_start
+    carrier_digest = packet.wire.sha(carrier_bytes)
     fps = Fraction(*profile["recipe"]["fps"])
     duration_s = float(Fraction(240, 1) / fps)
     warm_bytes = int(accounting["frame"])
@@ -365,7 +401,9 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
         base_frames, av1_decode_s = decode_ivf_to_canvas(
             sections["base"], coded_w, coded_h, canvas_w, canvas_h, args.frames, tmp
         )
-        src_frames = load_source_video(args.source, args.frames, width=canvas_w, height=canvas_h)
+        # The sender selects from the entire shot, including for the bounded receiver smoke.
+        source_frames = 240 if multiview else args.frames
+        src_frames = load_source_video(args.source, source_frames, width=canvas_w, height=canvas_h)
 
         roles: tuple[str, ...] = ("near", "far")
         unit_inputs: dict[str, dict[str, Any]] = {}
@@ -375,33 +413,67 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
 
         for role in roles:
             unit_name = f"{args.event}_{role}"
-            run_data = decoded[unit_name][0]
-            raw_kp = np.asarray(run_data["kp"][: args.frames], dtype=np.float32)
-            smooth_kp = smooth_keypoints(raw_kp)
-            boxes = np.asarray(run_data["boxes"][: args.frames], dtype=np.float64)
+            runs = decoded[unit_name]
+            run_data = runs[0]
+            if multiview and (len(runs) != 1 or run_data["start"] != 0 or run_data["end"] != 240
+                              or run_data["reference_frame"] != 0):
+                raise ValueError(f"{unit_name} requires a continuous 240-frame shot and tick-zero reference")
+            raw_kp = np.asarray(run_data["kp"][:source_frames], dtype=np.float32)
+            boxes = np.asarray(run_data["boxes"][:source_frames], dtype=np.float64)
             ref_box = np.asarray(run_data["reference_box"], dtype=np.float64)
             ref_crop = np.asarray(run_data["reference"], dtype=np.uint8)
             unit_inputs[role] = {
-                "smooth_kp": smooth_kp,
+                "selection_kp": raw_kp,
                 "boxes": boxes,
                 "reference_box": ref_box,
                 "ref_crop": ref_crop,
             }
-            gt_kps[role] = smooth_kp
-            full_m0 = mask_full_res(supports[0][role_idx[role]])
-            alpha0, nbytes = encode_decode_psr_alpha_t0(full_m0, ref_box)
-            psr_alphas[role] = alpha0
-            psr_alpha_bytes += nbytes
+            if not multiview:
+                full_m0 = mask_full_res(supports[0][role_idx[role]])
+                alpha0, nbytes = encode_decode_psr_alpha_t0(full_m0, ref_box)
+                psr_alphas[role] = alpha0
+                psr_alpha_bytes += nbytes
+
+        pose_start = time.perf_counter()
+        for role, inp in unit_inputs.items():
+            inp["smooth_kp"] = smooth_keypoints(inp["selection_kp"])
+            gt_kps[role] = inp["smooth_kp"]
+        pose_prepare_s = time.perf_counter() - pose_start
+
+        views_by_arm = (
+            {("mls_step8_bgsub_alpha" if k == 1 else f"mls_step8_bgsub_alpha_k{k}"): k for k in args.views}
+            if multiview else {"mls_step8_bgsub_alpha": 1, "mls_step8_psr_alpha": 1, "mls_step8_sam_oracle": 1}
+        )
+        encoded = appearance.encode_views(src_frames, unit_inputs, max(args.views)) if multiview and max(args.views) > 1 else {}
+        cache_blobs = {
+            arm: appearance.pack_cache(encoded, carrier_digest, k)
+            for arm, k in views_by_arm.items() if k > 1
+        }
+        del src_frames[args.frames:]
 
         psr_alpha_extra_kbps = (psr_alpha_bytes * 8.0) / (duration_s * 1000.0)
 
-        # Smoke determinism check
+        determinism: dict[str, int] = {}
         if stage_name == "smoke":
-            for check_arm in ("mls_step8_bgsub_alpha", "mls_step8_psr_alpha"):
-                c1, _ = render_arm(check_arm, roles, role_idx, unit_inputs, base_frames[:4], supports, psr_alphas)
-                c2, _ = render_arm(check_arm, roles, role_idx, unit_inputs, base_frames[:4], supports, psr_alphas)
-                if not all(np.array_equal(a, b) for a, b in zip(c1, c2, strict=True)):
-                    raise RuntimeError(f"determinism check failed for {check_arm}")
+            smoke_frames = args.frames if multiview else 4
+            for arm, k in views_by_arm.items():
+                if arm == "mls_step8_sam_oracle":
+                    continue
+                max_abs_diff = 0
+                previous = None
+                for _ in range(2):
+                    extra = appearance.unpack_cache(cache_blobs[arm], carrier_digest, k, roles, source_frames)[0] if k > 1 else None
+                    render_name = "mls_step8_bgsub_alpha" if k > 1 else arm
+                    canvases, _ = render_arm(render_name, roles, role_idx, unit_inputs,
+                                             base_frames[:smoke_frames], supports, psr_alphas, extra_views=extra)
+                    if previous is not None:
+                        max_abs_diff = max(int(cv2.absdiff(a, b).max())
+                                           for a, b in zip(previous, canvases, strict=True))
+                    previous = canvases
+                determinism[arm] = max_abs_diff
+                if max_abs_diff != 0:
+                    raise RuntimeError(f"determinism check failed for {arm}: {max_abs_diff}")
+                del previous, canvases
 
         dists_model = quality.load_dists(args.vgg, "cpu")
         lpips_net = quality.load_lpips(args.alexnet, "cpu")
@@ -411,14 +483,28 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
 
         # Evaluate YOLO26x-pose every 10th frame in full (24 frames * 2 players = 48 player-frames) and 4 in smoke
         yolo_ticks = set(range(0, args.frames, 6 if stage_name == "smoke" else 10))
-        arms = ("mls_step8_bgsub_alpha", "mls_step8_psr_alpha", "mls_step8_sam_oracle")
         per_arm: dict[str, Any] = {}
         t0 = time.monotonic()
 
-        for arm in arms:
-            canvases, timing = render_arm(arm, roles, role_idx, unit_inputs, base_frames, supports, psr_alphas)
+        for arm, k in views_by_arm.items():
+            cache_start = time.perf_counter()
+            cache_blob = cache_blobs.get(arm, b"")
+            extra, cache_accounting = (
+                appearance.unpack_cache(cache_blob, carrier_digest, k, roles, source_frames)
+                if k > 1 else (None, {"reference": 0, "window": 0, "frame": 0})
+            )
+            cache_decode_s = time.perf_counter() - cache_start if k > 1 else 0.0
+            selections: dict[str, list[int]] = {}
+            render_name = "mls_step8_bgsub_alpha" if k > 1 else arm
+            canvases, timing = render_arm(render_name, roles, role_idx, unit_inputs, base_frames, supports,
+                                         psr_alphas, extra_views=extra, selection_log=selections)
             end_to_end_s = av1_decode_s + timing["synth_and_composite_seconds"]
+            if multiview:
+                end_to_end_s += carrier_decode_s + pose_prepare_s + cache_decode_s
             timing["av1_base_decode_seconds"] = av1_decode_s
+            timing["carrier_decode_seconds"] = carrier_decode_s
+            timing["pose_prepare_seconds"] = pose_prepare_s
+            timing["cache_decode_seconds"] = cache_decode_s
             timing["end_to_end_receiver_seconds"] = end_to_end_s
             timing["fps_end_to_end"] = float(args.frames) / max(end_to_end_s, 1e-6)
 
@@ -454,10 +540,12 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
                     dists_rows.append({"tick": t, "role": role, "dists": dval, "lpips": lpval, "psnr": psnr})
 
                 if t in yolo_ticks:
+                    detections = detect_yolo_pose(yolo_model, canvas, device="cpu") if multiview else None
                     for role in roles:
                         idx = role_idx[role]
                         bbox, _ = boxes_t[idx]
-                        oks = best_yolo_oks(yolo_model, canvas, gt_kps[role][t], bbox)
+                        oks = (match_yolo_pose(detections, gt_kps[role][t], bbox) if detections is not None
+                               else best_yolo_oks(yolo_model, canvas, gt_kps[role][t], bbox))
                         yolo_rows.append({"tick": t, "role": role, "oks": oks, "recalled": oks >= 0.5})
 
             prefix48 = [r for r in dists_rows if r["tick"] < 48]
@@ -477,6 +565,24 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
                 "warm_kbps_total": warm_kbps + (psr_alpha_extra_kbps if arm == "mls_step8_psr_alpha" else 0.0),
                 "timing": timing,
             }
+            if multiview:
+                per_arm[arm].update({
+                    "views_per_player": k,
+                    "extra_wire_bytes": len(cache_blob),
+                    "extra_cold_bytes": len(cache_blob),
+                    "extra_avif_q90_bytes": cache_accounting["reference"],
+                    "extra_cold_framing_bytes": cache_accounting["window"],
+                    "extra_warm_bytes": cache_accounting["frame"],
+                    "cold_bytes_total": cold_bytes + len(cache_blob),
+                    "cache_sha256": packet.wire.sha(cache_blob) if cache_blob else None,
+                    "reference_ticks": {role: [0] + [tick for tick, _ in encoded.get(role, [])[:k - 1]] for role in roles},
+                    "extra_avif_q90_bytes_per_view": {
+                        role: [len(payload) for _, payload in encoded.get(role, [])[:k - 1]] for role in roles
+                    },
+                    "view_frame_counts": {role: [selections[role].count(slot) for slot in range(k)] for role in roles},
+                    "view_switches": {role: sum(a != b for a, b in zip(selections[role], selections[role][1:])) for role in roles},
+                })
+            del canvases
             print(
                 json.dumps(
                     {
@@ -498,7 +604,7 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
             "frames": args.frames,
             "fps": str(fps),
             "duration_seconds": duration_s,
-            "carrier_sha256": sha256(args.carrier),
+            "carrier_sha256": carrier_digest,
             "source_sha256": sha256(args.source),
             "support_sha256": support_hash,
             "warm_bytes": warm_bytes,
@@ -510,20 +616,43 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
             "wall_seconds": time.monotonic() - t0,
             "arms": per_arm,
         }
-        text = json.dumps(summary, indent=2) + "\n"
+        if multiview:
+            ffmpeg = shutil.which("ffmpeg")
+            assert ffmpeg is not None
+            summary.update({
+                "job_id": Path(os.environ["PS_JOB_DIR"]).name,
+                "determinism_max_abs_diff": determinism,
+                "determinism_frames": args.frames if stage_name == "smoke" else 0,
+                "cpu_threads": torch.get_num_threads(),
+                "opencv_threads": cv2.getNumThreads(),
+                "cpu_affinity": sorted(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else None,
+                "receiver_sam_runtime_calls": 0,
+                "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
+                "avif": {"encoder": "Pillow AVIF", "decoder": "Pillow AVIF", "pillow_version": pillow_version,
+                         "quality": appearance.QUALITY, "subsampling": "4:4:4"},
+                "native_decoder": {"path": ffmpeg, "version": subprocess.check_output([ffmpeg, "-version"], text=True).splitlines()[0]},
+                "judge_sha256": {"dists": VGG_SHA256, "lpips": ALEXNET_SHA256, "yolo_pose": YOLO_POSE_SHA256},
+            })
+        text = json.dumps(summary, indent=2, allow_nan=False) + "\n"
         pub = scratch / "publish"
         pub.mkdir(parents=True, exist_ok=True)
-        out_name = f"warp_native240_{args.event}.json"
+        out_name = result_name(args)
         (pub / out_name).write_text(text)
         (stage_dir / out_name).write_text(text)
         return summary
 
 
+def result_name(args: argparse.Namespace) -> str:
+    return f"tomm-mls-multiview-{args.event}-scores.json" if args.views else f"warp_native240_{args.event}.json"
+
+
 def validate_stage(args: argparse.Namespace) -> None:
     stage_dir = Path(os.environ["PS_STAGE_DIR"])
-    data = json.loads((stage_dir / f"warp_native240_{args.event}.json").read_text())
+    data = json.loads((stage_dir / result_name(args)).read_text())
     arms = data.get("arms", {})
     expected = {"mls_step8_bgsub_alpha", "mls_step8_psr_alpha", "mls_step8_sam_oracle"}
+    if args.views:
+        expected = {("mls_step8_bgsub_alpha" if k == 1 else f"mls_step8_bgsub_alpha_k{k}") for k in args.views}
     checks = {
         "has_all_arms": set(arms) == expected,
         "finite_metrics": all(
@@ -535,6 +664,29 @@ def validate_stage(args: argparse.Namespace) -> None:
             float(v["timing"]["end_to_end_receiver_seconds"]) > 0.0 for v in arms.values()
         ),
     }
+    if args.views:
+        smoke = os.environ["PS_STAGE"] == "smoke"
+        expected_frames = 16 if smoke else 240
+        checks.update({
+            "frame_count": data["frames"] == expected_frames and data["stage"] == os.environ["PS_STAGE"],
+            "denominators": all(v["n_player_frames"] == 2 * expected_frames
+                                and v["yolo_pose_n"] == (6 if smoke else 48) for v in arms.values()),
+            "determinism": not smoke or data["determinism_max_abs_diff"] == dict.fromkeys(expected, 0),
+            "one_cpu_zero_gpu_zero_sam": data["cpu_threads"] == data["opencv_threads"] == 1
+                and len(data["cpu_affinity"] or []) == 1
+                and data["cuda_visible_devices"] == "" and data["receiver_sam_runtime_calls"] == 0,
+            "warm_accounting": all(v["extra_warm_bytes"] == 0 and v["warm_kbps_total"] == data["warm_kbps"]
+                                   for v in arms.values()),
+            "cold_accounting": all(v["extra_cold_bytes"] == v["extra_avif_q90_bytes"] + v["extra_cold_framing_bytes"]
+                                   and v["cold_bytes_total"] == data["cold_bytes"] + v["extra_cold_bytes"]
+                                   and sum(sum(sizes) for sizes in v["extra_avif_q90_bytes_per_view"].values())
+                                   == v["extra_avif_q90_bytes"]
+                                   and (v["extra_avif_q90_bytes"] > 0) == (v["views_per_player"] > 1)
+                                   for v in arms.values()),
+            "reference_binding": all(len(ticks) == len(set(ticks)) == v["views_per_player"] and ticks[0] == 0
+                                     and all(0 <= tick < 240 for tick in ticks)
+                                     for v in arms.values() for ticks in v["reference_ticks"].values()),
+        })
     ok = all(checks.values())
     val_path = os.environ.get("PS_VALIDATION_PATH")
     if val_path:
@@ -555,7 +707,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--alexnet", type=Path)
     ap.add_argument("--yolo-pose", type=Path)
     ap.add_argument("--frames", type=int, default=240)
+    ap.add_argument("--views", type=int, choices=(1, 2, 3), nargs="+")
     args, _ = ap.parse_known_args(argv)
+    if args.views and len(args.views) != len(set(args.views)):
+        ap.error("--views must be unique")
     if args.validate:
         validate_stage(args)
         return 0

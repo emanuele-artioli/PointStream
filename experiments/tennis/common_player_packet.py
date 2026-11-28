@@ -433,6 +433,7 @@ def _decode(profile: dict[str, Any], sections: dict[str, bytes]) -> dict[str, An
             boxes = k6b.run_boxes(list(kp[a:b]))
             decoded_runs.append({'start': run['start'], 'end': run['end'], 't': t[a:b], 'kp': kp[a:b],
                                  'boxes': boxes, 'reference': image, 'reference_box': box,
+                                 'reference_frame': rm['reference_frame'],
                                  'seed': int(hashlib.sha256(name.encode()).hexdigest()[:7], 16) * 1009 + run_id})
         output[name] = decoded_runs
     if len(profile['runs']) != sum(len(v) for v in output.values()) or set(sections) != expected_names:
