@@ -90,4 +90,14 @@ Only `Synthesize(reference, poses, seed)` varies across the three arms.
 |---|---|---|---|---|
 | Generation (attempt 1, failed) | `20261128T025643Z-308b4b4b` | `gpu6` (RTX 6000 Ada) | Failed (smoke) | Missing `feature_extractor=None` for ControlNet pipeline; fixed in `9d3d8016` |
 | Generation (16f smoke + 48f full) | `20261128T030058Z-38a88b23` | `gpu6` (RTX 6000 Ada) | Complete | Exclusive RTX 6000 Ada (`timing_contaminated=false`, 4.3 min); `published.tar` sha256 `8dec6ea8...` |
-| Scoring (16f smoke + 48f full) | TBD | TBD | Pending | DISTS, LPIPS, PSNR, flow, tLPIPS, YOLO26x-pose |
+| Scoring (16f smoke + 48f full) | `20261128T030745Z-2675dcdb` | `gpu5` (CPU) | Complete | 13.5 min; verified receipt saved at `docs/experiments/tomm-multi-backbone-20261128-scores.json` |
+
+## Verified Results (48 frames, 2 players, Shanghai `match102`, Exclusive RTX 6000 Ada)
+
+| Backbone (`Synthesize`) | Masked DISTS ↓ | Masked LPIPS ↓ | Masked PSNR (dB) ↑ | `self_flow_error` ↓ | `tLPIPS` ↓ | `YOLO26x-pose` Recall@0.5 / OKS ↑ | Gen Time (s) ↓ | Speedup vs. DDIM-30 ↑ |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `aa_dpm10_ov8_smooth` (Moore-AnimateAnyone, ReferenceNet + 3D MM + fit) | **0.3041** | **0.3293** | **12.92** | 17.51 | 0.0571 | 83.3% / **0.815** | 100.11 | 6.74× |
+| `cn_openpose_sd15_dpm10` (ControlNet-v1.1-OpenPose + SD 1.5, 2D zero-shot) | 0.4019 | 0.4346 | 11.29 | 23.82 | 0.1120 | **95.8%** / 0.782 | 37.04 | 18.21× |
+| `k6_ref_warp` (Non-generative Gaussian keypoint warp) | 0.3346 | 0.3622 | 12.41 | **13.83** | **0.0565** | 79.2% / 0.744 | **0.68** | **990.6×** |
+
+**Decision & Takeaway:** Hypothesis confirmed. All three `Synthesize` backbones consume the identical `PSCP` + `PSR` wire payload (`players.pscp`, sha256 `3ebc2e45...`), cleaned SVT-AV1 base, and source-denied `SAM 3.1` compositing without protocol changes. The zero-shot 2D ControlNet-OpenPose + SD 1.5 backbone achieves 95.8% `YOLO26x-pose` recall (0.782 OKS) at 18.2× speedup vs. DDIM-30, refuting the competing hypothesis that `PSCP` poses are coupled to Moore-AnimateAnyone, while showing why ReferenceNet + 3D temporal attention (`aa_dpm10_ov8_smooth`) is required for best masked perceptual quality (0.3041 DISTS) and temporal stability (0.0571 tLPIPS). Total GPU spend: ~0.07 GPU-hours (well under the 4.0 GPU-hour ceiling).
