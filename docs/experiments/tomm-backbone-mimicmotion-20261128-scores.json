@@ -1,0 +1,38 @@
+{
+  "event": "match102",
+  "stage": "full",
+  "frames": 48,
+  "roles": [
+    "near",
+    "far"
+  ],
+  "gen_tar_sha256": "baac6de92285241d35edf901ae088e0fae7e1bf81a916e1f1df0f21156e3c940",
+  "carrier_sha256": "3ebc2e455509db026919f17c17d2bfce3eba899fd29a0888c47440b576a219af",
+  "source_mask_rle_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e",
+  "device": "NVIDIA RTX 6000 Ada Generation",
+  "timing_contaminated": false,
+  "ddim30_48f_seconds_ref": 674.4665817180066,
+  "self_dists_check": 1.1920928955078125e-07,
+  "elapsed_s": 211.45366363297217,
+  "backbones": {
+    "mimicmotion_svdx": {
+      "n_dists": 96,
+      "masked_dists": 0.3349694814532995,
+      "masked_lpips": 0.339147405543675,
+      "masked_psnr_db": 12.849500329300977,
+      "near_dists": 0.3218507232765357,
+      "far_dists": 0.34808823963006336,
+      "n_flow": 94,
+      "source_flow_error": 23.857262804153116,
+      "self_flow_error": 14.711448035341627,
+      "tlpips_n": 22,
+      "tlpips_mean": 0.04420307168567723,
+      "yolo26x_pose_n": 24,
+      "yolo26x_pose_oks_mean": 0.8631041816978529,
+      "yolo26x_pose_recall_at_050": 0.9166666666666666,
+      "render_s_total": 159.4814636989031,
+      "sec_per_player_frame": 1.661265246863574,
+      "speedup_vs_ddim30": 4.229122094034591
+    }
+  }
+}

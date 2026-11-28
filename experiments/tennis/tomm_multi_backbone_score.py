@@ -354,12 +354,13 @@ def score_run(args: argparse.Namespace) -> dict[str, Any]:
     return result
 
 
-def validate(_args: argparse.Namespace) -> None:
+def validate(args: argparse.Namespace) -> None:
     stage_dir = Path(os.environ["PS_STAGE_DIR"])
     data = json.loads((stage_dir / "tomm-multi-backbone-scores.json").read_text())
     bbs = data["backbones"]
+    expected_backbones = {b.strip() for b in args.expected_backbones.split(",") if b.strip()}
     checks = {
-        "has_all_backbones": set(bbs) == {"k6_ref_warp", "aa_dpm10_ov8_smooth", "cn_openpose_sd15_dpm10"},
+        "has_all_backbones": set(bbs) == expected_backbones,
         "self_dists_ok": float(data["self_dists_check"]) < 1e-5,
         "finite_scores": all(
             math.isfinite(c["masked_dists"])
@@ -385,6 +386,10 @@ def main() -> None:
     for k in ("carrier", "pixels", "features", "witness", "vgg", "alexnet", "yolo-pose"):
         p.add_argument("--" + k, type=Path, required="--validate" not in sys.argv)
     p.add_argument("--frames", type=int, choices=(16, 48), default=48)
+    p.add_argument(
+        "--expected-backbones",
+        default="k6_ref_warp,aa_dpm10_ov8_smooth,cn_openpose_sd15_dpm10",
+    )
     p.add_argument("--validate", action="store_true")
     args = p.parse_args()
     if args.validate:
