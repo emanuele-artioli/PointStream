@@ -479,6 +479,11 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
         lpips_net = quality.load_lpips(args.alexnet, "cpu")
         from ultralytics import YOLO
 
+        if multiview:
+            # Ultralytics resets PyTorch's CPU thread pool during first prediction.
+            from ultralytics.utils import torch_utils
+
+            torch_utils.NUM_THREADS = 1
         yolo_model = YOLO(str(args.yolo_pose))
 
         # Evaluate YOLO26x-pose every 10th frame in full (24 frames * 2 players = 48 player-frames) and 4 in smoke
@@ -487,6 +492,8 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
         t0 = time.monotonic()
 
         for arm, k in views_by_arm.items():
+            if multiview and torch.get_num_threads() != 1:
+                raise RuntimeError("CPU judge changed the one-thread PyTorch setting")
             cache_start = time.perf_counter()
             cache_blob = cache_blobs.get(arm, b"")
             extra, cache_accounting = (
@@ -619,8 +626,16 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
         if multiview:
             ffmpeg = shutil.which("ffmpeg")
             assert ffmpeg is not None
+            job_dir = Path(os.environ["PS_JOB_DIR"])
+            if job_dir.name == "run":
+                job_dir = job_dir.parent
+            dispatch = json.loads((stage_dir / "dispatch.json").read_text())
             summary.update({
-                "job_id": Path(os.environ["PS_JOB_DIR"]).name,
+                "job_id": job_dir.name,
+                "fleet_host": dispatch["environment"]["alias"],
+                "fleet_gpu_claim": dispatch["environment"]["gpu"],
+                "code": dispatch["code"],
+                "command": dispatch["command"],
                 "determinism_max_abs_diff": determinism,
                 "determinism_frames": args.frames if stage_name == "smoke" else 0,
                 "cpu_threads": torch.get_num_threads(),
@@ -674,7 +689,8 @@ def validate_stage(args: argparse.Namespace) -> None:
             "determinism": not smoke or data["determinism_max_abs_diff"] == dict.fromkeys(expected, 0),
             "one_cpu_zero_gpu_zero_sam": data["cpu_threads"] == data["opencv_threads"] == 1
                 and len(data["cpu_affinity"] or []) == 1
-                and data["cuda_visible_devices"] == "" and data["receiver_sam_runtime_calls"] == 0,
+                and data["cuda_visible_devices"] == "" and data["receiver_sam_runtime_calls"] == 0
+                and data["fleet_gpu_claim"] is None,
             "warm_accounting": all(v["extra_warm_bytes"] == 0 and v["warm_kbps_total"] == data["warm_kbps"]
                                    for v in arms.values()),
             "cold_accounting": all(v["extra_cold_bytes"] == v["extra_avif_q90_bytes"] + v["extra_cold_framing_bytes"]

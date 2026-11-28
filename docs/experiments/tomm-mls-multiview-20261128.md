@@ -18,7 +18,7 @@ This addresses the out-of-plane turn failure in the TOMM receiver-cost compariso
 
 | Match | Fleet job | Frozen revision | Status |
 |---|---|---|---|
-| Shanghai, K=1/2/3 | `20261128T122416Z-4f6db8c2` | `c2f1863770e29612ac993367fdaea3046235ca78` | Submitted |
+| Shanghai, K=1/2/3 | `20261128T122416Z-4f6db8c2` | `c2f1863770e29612ac993367fdaea3046235ca78` | Smoke rejected on gpu1 |
 
 The Shanghai deadline is 2026-11-28 18:00 UTC. The publication root is
 `/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261128T122416Z-4f6db8c2/`;
@@ -28,3 +28,7 @@ The pool passed the [fleet doctor](../fleet.md#one-entry-point) using check `192
 Archived SAM masks supply the existing scoring support. They are read by the judge, and the new receiver path never receives a matte from them.
 
 Local synthetic verification used real AVIF Q90 encode/decode, two players, all 16 frames, both added cache sizes, and a constructed orientation change. It exercised the cold binding and zero warm bytes, rejected a different carrier hash, switched views and obtained pixel max absolute difference zero. The native smoke and 240-frame job provide the broadcast measurements.
+
+Repository-wide Ruff and mypy passed with the CI-pinned tools after switching single-channel OpenCV scalar arguments to one-element tuples. A local pixel comparison confirmed the typed call form preserved the GrabCut matte and composite output exactly. The common packet, packet finish and pose-rate tests passed. The full suite encountered an inherited experiment-card format failure on `tomm-backbone-mimicmotion-20261128.md`. The macOS process-suspension test also failed under sandbox restrictions on `ps` and passed when rerun with process inspection available.
+
+The first native smoke produced exact repeated pixels for all three arms and zero warm-byte additions. AVIF Q90 payload and total cold increments were 41,087 B and 41,552 B for K=2 and 80,373 B and 81,100 B for K=3. The validator blocked full scoring because Ultralytics changed PyTorch's thread setting to eight during the CPU judge, despite verified one-core affinity, empty CUDA visibility and no GPU claim. The retry pins the judge's thread setting and verifies it before each timed arm. It targets gpu5, the historical Shanghai timing host, and reduces the cap to 2,650 seconds to account for the failed smoke within the Shanghai campaign budget.

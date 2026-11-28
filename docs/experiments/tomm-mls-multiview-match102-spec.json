@@ -105,11 +105,7 @@
   "deadline": "2026-11-28T18:00:00Z",
   "verify_staged_inputs": true,
   "hosts": [
-    "gpu1",
-    "gpu2",
-    "gpu3",
-    "gpu5",
-    "gpu6"
+    "gpu5"
   ],
   "gpu_models": [],
   "gpu_memory_mib": 0,
@@ -117,14 +113,14 @@
   "single_cpu_campaign": true,
   "local_storage_gib": 36,
   "smoke": {
-    "seconds": 400,
+    "seconds": 360,
     "representative_basis": "Two players on the first 16 native Shanghai frames, using the full shot's selected cold AVIF views. Repeat cold cache decode, seeded GrabCut, pose selection, MLS warp and composite for K=1,2,3; validate exact pixels, denominators, single CPU affinity and the separate warm/cold bill."
   },
   "full": {
-    "seconds": 2400
+    "seconds": 2200
   },
   "validator_seconds": 30,
-  "budget_seconds": 2900,
+  "budget_seconds": 2650,
   "stall_seconds": 1200,
   "scale": {
     "frames": {

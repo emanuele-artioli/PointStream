@@ -74,6 +74,7 @@ Draft a caption before launching a paper experiment. Name the missing point, met
 | Item | Card | Branch | Owner | Status |
 |---|---|---|---|---|
 | Starved-rate paper figures | [Second complete rally](docs/experiments/joint-replication-feasibility-20261122/README.md) | `codex/starved-figure-campaign` | Figure campaign | Completed 2026-11-22 |
+| Real-time CPU receiver | [Cold multi-view cache](docs/experiments/tomm-mls-multiview-20261128.md) | `tomm/mls-multiview-20261128` | Receiver experiment | Shanghai pilot submitted |
 
 Follow the five linked experiment cards above for the campaign results and the [sessions index](docs/sessions.md) for older items. The original shared-reference pilot is closed. Current planning dates are December 19 for research close and December 26 for submission preparation. [Scientific protocol](docs/experiments.md#protocol) · [Fleet rules](docs/fleet.md) · [Source provenance](docs/paper/tennis-source-provenance-2026-11-01.md) · [Author manuscript](docs/paper/manuscript-integration-2026-11-17.md)
 
