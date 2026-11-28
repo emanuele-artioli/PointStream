@@ -67,6 +67,7 @@ def build_controlnet_pipeline(
         torch_dtype=torch.float16,
         variant="fp16",
         safety_checker=None,
+        feature_extractor=None,
         requires_safety_checker=False,
         local_files_only=True,
     )
