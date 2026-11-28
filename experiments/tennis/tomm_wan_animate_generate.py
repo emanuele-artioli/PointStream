@@ -417,8 +417,9 @@ def run_ablation(args: argparse.Namespace) -> None:
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA required")
 
+    torch.cuda.set_device(0)
     device = torch.device("cuda:0")
-    torch.cuda.reset_peak_memory_stats(device)
+    torch.cuda.reset_peak_memory_stats(0)
 
     code_root, ckpt_dir = _assemble_ckpt_dir(args, scratch)
     kernel_stats = _install_shims_and_sdpa_patch(code_root)
