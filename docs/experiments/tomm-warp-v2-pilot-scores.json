@@ -1,0 +1,117 @@
+{
+  "stage": "full",
+  "frames": 48,
+  "roles": [
+    "near",
+    "far"
+  ],
+  "support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e",
+  "wall_seconds": 1247.254826106946,
+  "variants": {
+    "v1_gauss_sam": {
+      "n_player_frames": 96,
+      "dists_mean": 0.3346342022220294,
+      "lpips_mean": 0.36221484816633165,
+      "psnr_mean": 12.410712385151562,
+      "source_flow_error_mean": 26.125321865081787,
+      "self_flow_error_mean": 13.825021079246033,
+      "tlpips_mean": 0.0524454057555307,
+      "yolo_pose_recall_at_050": 0.7916666666666666,
+      "yolo_pose_mean_oks": 0.7436142759210047,
+      "yolo_pose_n": 24,
+      "timing": {
+        "matte_init_seconds": 4.069879651069641e-07,
+        "warp_seconds": 1.0822591949254274,
+        "composite_seconds": 0.24486399732995778,
+        "total_receiver_seconds": 1.3271235992433503,
+        "fps_total": 36.16844733027643,
+        "fps_steady_state": 36.16845842202953,
+        "speedup_vs_ddim30": 508.21685493540224
+      }
+    },
+    "v2_lbs_sam": {
+      "n_player_frames": 96,
+      "dists_mean": 0.3245974586655696,
+      "lpips_mean": 0.3474587781820446,
+      "psnr_mean": 12.711047478498761,
+      "source_flow_error_mean": 24.563995513510196,
+      "self_flow_error_mean": 13.119739740452868,
+      "tlpips_mean": 0.04606888993558558,
+      "yolo_pose_recall_at_050": 0.75,
+      "yolo_pose_mean_oks": 0.6981620142240293,
+      "yolo_pose_n": 24,
+      "timing": {
+        "matte_init_seconds": 4.899920895695686e-07,
+        "warp_seconds": 1.0045887153828517,
+        "composite_seconds": 0.2608485942473635,
+        "total_receiver_seconds": 1.2654377996223047,
+        "fps_total": 37.93153643294563,
+        "fps_steady_state": 37.931551120479064,
+        "speedup_vs_ddim30": 532.9907024425181
+      }
+    },
+    "v2_mls_sam": {
+      "n_player_frames": 96,
+      "dists_mean": 0.32648811986049014,
+      "lpips_mean": 0.34959898275944096,
+      "psnr_mean": 12.793638152159264,
+      "source_flow_error_mean": 25.13214512074247,
+      "self_flow_error_mean": 14.408182549983897,
+      "tlpips_mean": 0.048922988247465,
+      "yolo_pose_recall_at_050": 0.9583333333333334,
+      "yolo_pose_mean_oks": 0.9044328413086475,
+      "yolo_pose_n": 24,
+      "timing": {
+        "matte_init_seconds": 3.8801226764917374e-07,
+        "warp_seconds": 2.790177499759011,
+        "composite_seconds": 0.2669145183172077,
+        "total_receiver_seconds": 3.0570924060884863,
+        "fps_total": 15.701193691235337,
+        "fps_steady_state": 15.701195684062421,
+        "speedup_vs_ddim30": 220.6235507879131
+      }
+    },
+    "v2_lbs_warped_mask": {
+      "n_player_frames": 96,
+      "dists_mean": 0.34806962807973224,
+      "lpips_mean": 0.40126446813034516,
+      "psnr_mean": 12.513719606743123,
+      "source_flow_error_mean": 24.103446869139976,
+      "self_flow_error_mean": 11.375449936440651,
+      "tlpips_mean": 0.051494453017684544,
+      "yolo_pose_recall_at_050": 0.4583333333333333,
+      "yolo_pose_mean_oks": 0.33529501517729454,
+      "yolo_pose_n": 24,
+      "timing": {
+        "matte_init_seconds": 0.2011548390146345,
+        "warp_seconds": 1.2138313348405063,
+        "composite_seconds": 0.13222853525076061,
+        "total_receiver_seconds": 1.5472147091059014,
+        "fps_total": 31.023489963935294,
+        "fps_steady_state": 35.65963228422036,
+        "speedup_vs_ddim30": 435.9230672695484
+      }
+    },
+    "v2_mls_warped_mask": {
+      "n_player_frames": 96,
+      "dists_mean": 0.3447408365706603,
+      "lpips_mean": 0.3993940312260141,
+      "psnr_mean": 12.573989807173156,
+      "source_flow_error_mean": 24.82050309282668,
+      "self_flow_error_mean": 12.628487800029998,
+      "tlpips_mean": 0.05255815496837551,
+      "yolo_pose_recall_at_050": 0.5833333333333334,
+      "yolo_pose_mean_oks": 0.5232472995255921,
+      "yolo_pose_n": 24,
+      "timing": {
+        "matte_init_seconds": 0.09426753409206867,
+        "warp_seconds": 2.9927114786114544,
+        "composite_seconds": 0.14525586611125618,
+        "total_receiver_seconds": 3.232234878814779,
+        "fps_total": 14.850405926440907,
+        "fps_steady_state": 15.296526294553127,
+        "speedup_vs_ddim30": 208.66880254857136
+      }
+    }
+  }
+}

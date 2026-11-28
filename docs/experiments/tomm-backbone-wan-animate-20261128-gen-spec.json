@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.tomm_wan_animate_generate"
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.tomm_wan_animate_generate",
+    "--validate"
+  ],
+  "arguments": [
+    "--carrier",
+    "{staged:carrier}",
+    "--code-configs-tar",
+    "{staged:code_configs}",
+    "--vae",
+    "{staged:vae}",
+    "--clip",
+    "{staged:clip}",
+    "--t5",
+    "{staged:t5}",
+    "--dit1",
+    "{staged:dit1}",
+    "--dit2",
+    "{staged:dit2}",
+    "--dit3",
+    "{staged:dit3}",
+    "--dit4",
+    "{staged:dit4}",
+    "--frames",
+    "{frames}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "carrier",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/rv102-paid-fdc8fcbb39599348/players.pscp",
+      "sha256": "3ebc2e455509db026919f17c17d2bfce3eba899fd29a0888c47440b576a219af",
+      "extract": false
+    },
+    {
+      "name": "code_configs",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-multi-backbone-20261128/wan-animate-code-configs.tar",
+      "sha256": "13491ecff60194f115ab31d98793f2c11b720981c1a9f3ee53ddd6079ae7a7b0",
+      "extract": false
+    },
+    {
+      "name": "vae",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-multi-backbone-20261128/wan-animate-14b/Wan2.1_VAE.pth",
+      "sha256": "acf6c5aa49ad281d4b561e10656e2397c446a8ba4b8d8f19d3dd125c2628bc6a",
+      "extract": false
+    },
+    {
+      "name": "clip",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-multi-backbone-20261128/wan-animate-14b/models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth",
+      "sha256": "628c9998b613391f193eb67ff68da9667d75f492911e4eb3decf23460a158c38",
+      "extract": false
+    },
+    {
+      "name": "t5",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-multi-backbone-20261128/wan-animate-14b/models_t5_umt5-xxl-enc-bf16.pth",
+      "sha256": "7cace0da2b446bbbbc57d031ab6cf163a3d59b366da94e5afe36745b746fd81d",
+      "extract": false
+    },
+    {
+      "name": "dit1",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-multi-backbone-20261128/wan-animate-14b/diffusion_pytorch_model-00001-of-00004.safetensors",
+      "sha256": "575c2dba750c3b40240fb742a4224453aa97dfbd3c5f5a0086be431cdefdd69c",
+      "extract": false
+    },
+    {
+      "name": "dit2",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-multi-backbone-20261128/wan-animate-14b/diffusion_pytorch_model-00002-of-00004.safetensors",
+      "sha256": "b90b820627d43eeeb1ae0489182f9a8c870374fd72cc99dccb9eddfc2ace8325",
+      "extract": false
+    },
+    {
+      "name": "dit3",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-multi-backbone-20261128/wan-animate-14b/diffusion_pytorch_model-00003-of-00004.safetensors",
+      "sha256": "e2aa343b0ba04f563566e9959a439611a18189cd9accdc04d59681be9ce5be50",
+      "extract": false
+    },
+    {
+      "name": "dit4",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-multi-backbone-20261128/wan-animate-14b/diffusion_pytorch_model-00004-of-00004.safetensors",
+      "sha256": "e5fea7f38aa4cb70ed59a9ecf406d0c05f3dfc85ee70bc83de35679c42642d1b",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/rv102-paid-fdc8fcbb39599348/players.pscp",
+      "sha256": "3ebc2e455509db026919f17c17d2bfce3eba899fd29a0888c47440b576a219af"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-multi-backbone-20261128/wan-animate-code-configs.tar",
+      "sha256": "13491ecff60194f115ab31d98793f2c11b720981c1a9f3ee53ddd6079ae7a7b0"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-jcv-20261022T124459Z.tar.gz",
+    "sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e"
+  },
+  "required_commands": [],
+  "deadline": "2026-11-28T11:00:00Z",
+  "verify_staged_inputs": true,
+  "hosts": [
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [
+    "RTX 6000 Ada"
+  ],
+  "gpu_memory_mib": 43000,
+  "gpu_sharing": {
+    "mode": "exclusive"
+  },
+  "contention": {
+    "policy": "continue",
+    "basis": "Exclusive RTX 6000 Ada generation for uncontaminated pinned-GPU timing of Track C Wan2.2-Animate-14B ablation"
+  },
+  "cpu_threads": 8,
+  "local_storage_gib": 64,
+  "smoke": {
+    "seconds": 600,
+    "representative_basis": "First 16 consecutive Shanghai near-player frames exercising Wan2.2-Animate-14B (bf16, Flash SDPA on SM 8.9, 20 DPM++ steps, unconditional black face) with 5-frame 4-step determinism check and 48f runtime forecast."
+  },
+  "full": {
+    "seconds": 2700
+  },
+  "validator_seconds": 60,
+  "budget_seconds": 3500,
+  "stall_seconds": 1200,
+  "scale": {
+    "frames": {
+      "smoke": 16,
+      "full": 48
+    }
+  }
+}
