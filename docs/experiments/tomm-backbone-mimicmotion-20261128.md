@@ -90,4 +90,12 @@ Audited on `gpu5` (2026-11-28):
 |---|---|---|---|---|
 | Generation (attempt 1, failed) | `20261128T083057Z-6927b7a1` | `gpu6` (RTX 6000 Ada) | Failed (smoke) | Passed `device="cuda"` string instead of `torch.device("cuda")` to `MimicMotionPipeline` |
 | Generation (attempt 2, 16f smoke + 48f full) | `20261128T083407Z-ef6a49a4` | `gpu6` (RTX 6000 Ada) | Complete | Exclusive RTX 6000 Ada (`timing_contaminated=false`, 4.6 min, peak 7.4 GiB); `published.tar` sha256 `baac6de9...` |
-| Scoring (16f smoke + 48f full) | _pending_ | CPU | Pending | `experiments.tennis.tomm_multi_backbone_score` |
+| Scoring (16f smoke + 48f full) | `20261128T084143Z-7b095d8a` | `gpu5` (CPU) | Complete | 5.5 min; verified receipt saved at `docs/experiments/tomm-backbone-mimicmotion-20261128-scores.json` (sha256 `85a87d40...`) |
+
+## Verified Results (48 frames, 2 players, Shanghai `match102`, Exclusive RTX 6000 Ada)
+
+| Backbone (`Synthesize`) | Masked DISTS ↓ | Masked LPIPS ↓ | Masked PSNR (dB) ↑ | `source_flow_error` ↓ | `self_flow_error` ↓ | `tLPIPS` ↓ | `YOLO26x-pose` Recall@0.5 / OKS ↑ | Gen Time (s) ↓ | Speedup vs. DDIM-30 ↑ |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `mimicmotion_svdx` (MimicMotion 1.1, SVD-XT 1.1 + PoseNet, zero-shot, 25 steps) | 0.3350 | 0.3391 | 12.85 | **23.86** | 14.71 | **0.0442** | 91.7% / **0.863** | 159.48 | 4.23× |
+
+**Decision & Takeaway:** Hypothesis confirmed. Zero-shot `mimicmotion_svdx` consumes the identical `PSCP` + `PSR` wire payload (`players.pscp`, sha256 `3ebc2e45...`), cleaned SVT-AV1 base, and source-denied `SAM 3.1` compositing without protocol changes, achieving the strongest temporal stability (`tLPIPS` = 0.0442, `source_flow_error` = 23.86) and highest post-decode `YOLO26x-pose` mean OKS (0.863 at 91.7% recall@0.5) of all tested backbones, while trailing domain-fitted `aa_dpm10_ov8_smooth` on masked DISTS (0.3350 vs. 0.3041) and runtime (159.48 s vs. 100.11 s). Total GPU spend: ~0.08 GPU-hours (well under the 2.5 GPU-hour ceiling).
