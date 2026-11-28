@@ -88,5 +88,6 @@ Only `Synthesize(reference, poses, seed)` varies across the three arms.
 
 | Stage | Job ID | Host / GPU | Status | Notes |
 |---|---|---|---|---|
-| Generation (16f smoke + 48f full) | TBD | TBD | Pending | Exclusive RTX 6000 Ada |
+| Generation (attempt 1, failed) | `20261128T025643Z-308b4b4b` | `gpu6` (RTX 6000 Ada) | Failed (smoke) | Missing `feature_extractor=None` for ControlNet pipeline; fixed in `9d3d8016` |
+| Generation (16f smoke + 48f full) | `20261128T030058Z-38a88b23` | `gpu6` (RTX 6000 Ada) | Complete | Exclusive RTX 6000 Ada (`timing_contaminated=false`, 4.3 min); `published.tar` sha256 `8dec6ea8...` |
 | Scoring (16f smoke + 48f full) | TBD | TBD | Pending | DISTS, LPIPS, PSNR, flow, tLPIPS, YOLO26x-pose |
