@@ -37,20 +37,8 @@ CN_PROMPT = "tennis player on court, photorealistic, broadcast sports video"
 CN_NEG_PROMPT = "blurry, distorted, low quality, cartoon, extra limbs"
 
 
-def _symlink_dir(mapping: dict[str, Path], root: Path) -> Path:
-    root.mkdir(parents=True, exist_ok=True)
-    for rel, src in mapping.items():
-        dst = root / rel
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        if dst.exists() or dst.is_symlink():
-            dst.unlink()
-        dst.symlink_to(src.resolve())
-    return root
-
-
 def build_controlnet_pipeline(
-    cn_files: dict[str, Path],
-    sd_files: dict[str, Path],
+    cn_sd_tar: Path,
     scratch: Path,
     device: str,
 ) -> Any:
@@ -61,8 +49,12 @@ def build_controlnet_pipeline(
         StableDiffusionControlNetImg2ImgPipeline,
     )
 
-    cn_dir = _symlink_dir(cn_files, scratch / "cn_openpose")
-    sd_dir = _symlink_dir(sd_files, scratch / "sd15")
+    root = scratch / "cn_sd15"
+    root.mkdir(parents=True, exist_ok=True)
+    with tarfile.open(cn_sd_tar) as tf:
+        tf.extractall(root, filter="data")
+    cn_dir = root / "control_v11p_sd15_openpose"
+    sd_dir = root / "stable-diffusion-v1-5"
     controlnet = ControlNetModel.from_pretrained(
         str(cn_dir),
         torch_dtype=torch.float16,
@@ -231,33 +223,6 @@ def run_ablation(args: argparse.Namespace) -> None:
             strict=True,
         )
     )
-    cn_files = dict(
-        zip(
-            ("config.json", "diffusion_pytorch_model.fp16.safetensors"),
-            map(Path, args.cn_weight),
-            strict=True,
-        )
-    )
-    sd_files = dict(
-        zip(
-            (
-                "model_index.json",
-                "scheduler/scheduler_config.json",
-                "text_encoder/config.json",
-                "text_encoder/model.fp16.safetensors",
-                "tokenizer/merges.txt",
-                "tokenizer/special_tokens_map.json",
-                "tokenizer/tokenizer_config.json",
-                "tokenizer/vocab.json",
-                "unet/config.json",
-                "unet/diffusion_pytorch_model.fp16.safetensors",
-                "vae/config.json",
-                "vae/diffusion_pytorch_model.fp16.safetensors",
-            ),
-            map(Path, args.sd_weight),
-            strict=True,
-        )
-    )
 
     _, _, decoded = packet.unpack(args.carrier.read_bytes())
     requested_units = [u.strip() for u in args.units.split(",") if u.strip()]
@@ -340,7 +305,7 @@ def run_ablation(args: argparse.Namespace) -> None:
 
     # 3. ControlNet-v1.1-OpenPose + SD 1.5 (2D frame-by-frame img2img, DPM-10)
     t0 = time.perf_counter()
-    cn_pipe = build_controlnet_pipeline(cn_files, sd_files, scratch, "cuda")
+    cn_pipe = build_controlnet_pipeline(args.cn_sd_tar, scratch, "cuda")
     load_times["cn_openpose_sd15_dpm10"] = time.perf_counter() - t0
     if stage_name == "smoke":
         u0 = unit_inputs[units[0]]
@@ -424,8 +389,7 @@ def main() -> None:
     p.add_argument("--carrier", type=Path, required=True)
     p.add_argument("--base", type=Path, required=True)
     p.add_argument("--aa-weight", type=Path, action="append", required=True)
-    p.add_argument("--cn-weight", type=Path, action="append", required=True)
-    p.add_argument("--sd-weight", type=Path, action="append", required=True)
+    p.add_argument("--cn-sd-tar", type=Path, required=True)
     p.add_argument("--frames", type=int, choices=(16, 48), required=True)
     p.add_argument("--units", default="match102_near,match102_far")
     p.add_argument("--validate", action="store_true")

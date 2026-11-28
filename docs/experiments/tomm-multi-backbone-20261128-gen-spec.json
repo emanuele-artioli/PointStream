@@ -31,34 +31,8 @@
     "{staged:aa6}",
     "--aa-weight",
     "{staged:aa7}",
-    "--cn-weight",
-    "{staged:cn0}",
-    "--cn-weight",
-    "{staged:cn1}",
-    "--sd-weight",
-    "{staged:sd0}",
-    "--sd-weight",
-    "{staged:sd1}",
-    "--sd-weight",
-    "{staged:sd2}",
-    "--sd-weight",
-    "{staged:sd3}",
-    "--sd-weight",
-    "{staged:sd4}",
-    "--sd-weight",
-    "{staged:sd5}",
-    "--sd-weight",
-    "{staged:sd6}",
-    "--sd-weight",
-    "{staged:sd7}",
-    "--sd-weight",
-    "{staged:sd8}",
-    "--sd-weight",
-    "{staged:sd9}",
-    "--sd-weight",
-    "{staged:sd10}",
-    "--sd-weight",
-    "{staged:sd11}",
+    "--cn-sd-tar",
+    "{staged:cn_sd_tar}",
     "--frames",
     "{frames}"
   ],
@@ -124,87 +98,9 @@
       "extract": false
     },
     {
-      "name": "cn0",
-      "path": "/home/itec/emanuele/Models/control_v11p_sd15_openpose/config.json",
-      "sha256": "aa6fecc8745c0d0b26f0d2ca0f686600c8b33177c667d44eb41a51e56e44a697",
-      "extract": false
-    },
-    {
-      "name": "cn1",
-      "path": "/home/itec/emanuele/Models/control_v11p_sd15_openpose/diffusion_pytorch_model.fp16.safetensors",
-      "sha256": "b25b1125e870275550b2a7de289056cb3c236c01c293bd5ba883657b1c006e3e",
-      "extract": false
-    },
-    {
-      "name": "sd0",
-      "path": "/home/itec/emanuele/Models/stable-diffusion-v1-5/model_index.json",
-      "sha256": "e2f6f22e274374010aec30c79eb2d6e53fff4a36ac0225523a92cb2d41a83347",
-      "extract": false
-    },
-    {
-      "name": "sd1",
-      "path": "/home/itec/emanuele/Models/stable-diffusion-v1-5/scheduler/scheduler_config.json",
-      "sha256": "699cce92eb7c122e2eb7dfdea78e6187fda76a5ed4a8e42319b85610e620e091",
-      "extract": false
-    },
-    {
-      "name": "sd2",
-      "path": "/home/itec/emanuele/Models/stable-diffusion-v1-5/text_encoder/config.json",
-      "sha256": "845df614cb9327ae7bbea027316246fae917827407da6df13572e41b5f93b4cc",
-      "extract": false
-    },
-    {
-      "name": "sd3",
-      "path": "/home/itec/emanuele/Models/stable-diffusion-v1-5/text_encoder/model.fp16.safetensors",
-      "sha256": "77795e2023adcf39bc29a884661950380bd093cf0750a966d473d1718dc9ef4e",
-      "extract": false
-    },
-    {
-      "name": "sd4",
-      "path": "/home/itec/emanuele/Models/stable-diffusion-v1-5/tokenizer/merges.txt",
-      "sha256": "9fd691f7c8039210e0fced15865466c65820d09b63988b0174bfe25de299051a",
-      "extract": false
-    },
-    {
-      "name": "sd5",
-      "path": "/home/itec/emanuele/Models/stable-diffusion-v1-5/tokenizer/special_tokens_map.json",
-      "sha256": "c4864a9376a8401918425bed71fc14fc0e81f9b59ec45c1cf96cccb2df508eac",
-      "extract": false
-    },
-    {
-      "name": "sd6",
-      "path": "/home/itec/emanuele/Models/stable-diffusion-v1-5/tokenizer/tokenizer_config.json",
-      "sha256": "00439066fcba73de57644cf41e4e3b9f2dbb09d7f3fc2005898ba52399045882",
-      "extract": false
-    },
-    {
-      "name": "sd7",
-      "path": "/home/itec/emanuele/Models/stable-diffusion-v1-5/tokenizer/vocab.json",
-      "sha256": "e089ad92ba36837a0d31433e555c8f45fe601ab5c221d4f607ded32d9f7a4349",
-      "extract": false
-    },
-    {
-      "name": "sd8",
-      "path": "/home/itec/emanuele/Models/stable-diffusion-v1-5/unet/config.json",
-      "sha256": "78f474de6bab3d893868f37be97b636ae65c0df3073ed3256ca458ff599b5f96",
-      "extract": false
-    },
-    {
-      "name": "sd9",
-      "path": "/home/itec/emanuele/Models/stable-diffusion-v1-5/unet/diffusion_pytorch_model.fp16.safetensors",
-      "sha256": "c83908253f9a64d08c25fc90874c9c8aef9a329ce1ca5fb909d73b0c83d1ea21",
-      "extract": false
-    },
-    {
-      "name": "sd10",
-      "path": "/home/itec/emanuele/Models/stable-diffusion-v1-5/vae/config.json",
-      "sha256": "786a7d21647ddea6a04b9675c03d3cb45e90a2f3c6da5fbda2c54ade040036de",
-      "extract": false
-    },
-    {
-      "name": "sd11",
-      "path": "/home/itec/emanuele/Models/stable-diffusion-v1-5/vae/diffusion_pytorch_model.fp16.safetensors",
-      "sha256": "4fbcf0ebe55a0984f5a5e00d8c4521d52359af7229bb4d81890039d2aa16dd7c",
+      "name": "cn_sd_tar",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-multi-backbone-20261128/cn-sd15-fp16.tar",
+      "sha256": "8170c5a87581826a3d4547f32c2d5864dae184012f51313744efd24becff9e19",
       "extract": false
     }
   ],
@@ -218,12 +114,8 @@
       "sha256": "075b001a3ae9dcc9fdda9fb81e4240aaf3a9da228d707ac58733db094d983285"
     },
     {
-      "path": "/home/itec/emanuele/Models/control_v11p_sd15_openpose/diffusion_pytorch_model.fp16.safetensors",
-      "sha256": "b25b1125e870275550b2a7de289056cb3c236c01c293bd5ba883657b1c006e3e"
-    },
-    {
-      "path": "/home/itec/emanuele/Models/stable-diffusion-v1-5/unet/diffusion_pytorch_model.fp16.safetensors",
-      "sha256": "c83908253f9a64d08c25fc90874c9c8aef9a329ce1ca5fb909d73b0c83d1ea21"
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-multi-backbone-20261128/cn-sd15-fp16.tar",
+      "sha256": "8170c5a87581826a3d4547f32c2d5864dae184012f51313744efd24becff9e19"
     }
   ],
   "environment": {
