@@ -1,0 +1,103 @@
+{
+  "scope": "accounting-only; no physical combined packet, decoded pixels, pose accuracy or latency measured",
+  "duration_seconds": 8.008,
+  "shanghai": [
+    {
+      "name": "Shanghai ordinary-320 + paid poses (accounting only)",
+      "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+      "video_producer_job": "20261122T135124Z-5a448b6b",
+      "video_archive_sha256": "058c050aa1c85ba2beebaf76553028e7fbdd74321d0c6a48bbdc6e65a1d085d1",
+      "video_sha256": "8e26c7677715534e49ef6451bc4b823a68b5dae4cca5a8eb5e3e188befaa79b0",
+      "video_bytes": 13408,
+      "pose_section_bytes": 2301,
+      "pose_parent_joint_sha256": "fdc8fcbb39599348e966f07666a0472cf4cbb9211e8baf7ada44ba59161b7780",
+      "profile": {
+        "kind": "ordinary-video-paid-pose-accounting-v1",
+        "frames": 240,
+        "fps": [
+          30000,
+          1001
+        ],
+        "canvas_size": [
+          1920,
+          1080
+        ],
+        "coded_size": [
+          320,
+          192
+        ],
+        "order": [
+          "match102_far",
+          "match102_near"
+        ],
+        "pose_payload": "unchanged-joint-poses-section",
+        "video_payload": "svt-av1-ivf",
+        "coordinates": "native-canvas"
+      },
+      "framing_bytes": 569,
+      "proposed_total_bytes": 16278,
+      "proposed_kbps": 16.261738261738262,
+      "full_obj_warm_bytes": 17794,
+      "spare_bytes_under_full_obj_ceiling": 1516,
+      "fits_full_obj_warm_ceiling": true
+    },
+    {
+      "name": "Shanghai ordinary-480 + paid poses (accounting only)",
+      "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+      "video_producer_job": "20261122T134638Z-6e79222b",
+      "video_archive_sha256": "45425dc6f41110cf23fa6d6ede40f80751445abdfe5d0ed2bda25a5fb357e851",
+      "video_sha256": "4df64f449a087cf6a00a6a82bd8596d5e15baf1314f64fda6ca33ad38144c0b5",
+      "video_bytes": 13494,
+      "pose_section_bytes": 2301,
+      "pose_parent_joint_sha256": "fdc8fcbb39599348e966f07666a0472cf4cbb9211e8baf7ada44ba59161b7780",
+      "profile": {
+        "kind": "ordinary-video-paid-pose-accounting-v1",
+        "frames": 240,
+        "fps": [
+          30000,
+          1001
+        ],
+        "canvas_size": [
+          1920,
+          1080
+        ],
+        "coded_size": [
+          480,
+          272
+        ],
+        "order": [
+          "match102_far",
+          "match102_near"
+        ],
+        "pose_payload": "unchanged-joint-poses-section",
+        "video_payload": "svt-av1-ivf",
+        "coordinates": "native-canvas"
+      },
+      "framing_bytes": 569,
+      "proposed_total_bytes": 16364,
+      "proposed_kbps": 16.347652347652346,
+      "full_obj_warm_bytes": 17794,
+      "spare_bytes_under_full_obj_ceiling": 1430,
+      "fits_full_obj_warm_ceiling": true
+    }
+  ],
+  "halle": {
+    "video_bytes": 16782,
+    "pose_section_bytes": 2165,
+    "lower_bound_before_framing_bytes": 18947,
+    "full_obj_warm_bytes": 18319,
+    "fits_even_before_framing": false
+  },
+  "input_receipt_sha256": {
+    "experiments/tennis/w8_payload.py": "9629bc596923540cf9eb3e17ebcc6b1c2b3000de15cf5019c33e083153a69a64",
+    "docs/experiments/test-crop-joint-20261122/match102-sender.json": "a5d054ad20e7666724a6589832ef8ffe9d87ab057617e4922690d25c3d9d6884",
+    "docs/experiments/shanghai-joint-low-anchors-20261122/320-receipt.json": "40e76155152ddb17665b48b286716288f1638baa4ce80d5a09245d31e664a574",
+    "docs/experiments/shanghai-joint-low-anchors-20261122/320-index.json": "05dfe81af16f8afface3e9a524ed04811da5407ee3e46089b90bfeefefc81fe5",
+    "docs/experiments/shanghai-joint-low-anchors-20261122/score-ordinary-320-warm.json": "6f4be63231e1fa132ab229abd1707edb9162d0d92c7a28a56eb029e08e9d953c",
+    "docs/experiments/shanghai-joint-low-anchors-20261122/480-receipt.json": "27b647a204260b40830c799e38f2e078381c1785e2fe386c9ad66dfbd4401e64",
+    "docs/experiments/shanghai-joint-low-anchors-20261122/480-index.json": "164f9994782a0b3763041595b9bbe84ba69fb61cf1b2cacdf52810ad46e86142",
+    "docs/experiments/shanghai-joint-low-anchors-20261122/score-ordinary-480-warm.json": "8ff01512252fa9a15f7620a19083d5e6ed2d4f54adac4f2a3e67eee2bcd568fe",
+    "docs/experiments/halle-foreground-20261123/sender-result.json": "a7125bd4140889c8f376f23ef245326498eef45ff9ba0d13807161de0bb02188",
+    "docs/experiments/halle-foreground-20261123/av1-320-score.json": "796f09927ea289e84930594ad0cd8d729ead78aa08d1f7f1adf262ce8cc79c28"
+  }
+}

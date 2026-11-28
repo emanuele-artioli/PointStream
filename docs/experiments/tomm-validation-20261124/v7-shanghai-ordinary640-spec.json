@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "device": "cpu",
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.tomm_player_pose_machine"
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.tomm_player_pose_machine",
+    "--validate"
+  ],
+  "arguments": [
+    "--source",
+    "{staged:source}",
+    "--pixels",
+    "{staged:pixels}",
+    "--features",
+    "{staged:features}",
+    "--ordinary",
+    "{staged:ordinary}",
+    "--roi",
+    "{staged:ordinary}",
+    "--neural",
+    "{staged:ordinary}",
+    "--witness",
+    "{staged:ordinary}",
+    "--carrier",
+    "{staged:carrier}",
+    "--yolo26x",
+    "{staged:yolo26x}",
+    "--yolo26l",
+    "{staged:yolo26l}",
+    "--match102-ordinary640-only",
+    "--frames",
+    "{frames}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "source",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match102-000-fc5d3ee431f8.mp4",
+      "sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+      "extract": false
+    },
+    {
+      "name": "pixels",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/rv102-rgb-2fd7f48841adb6ec/source.mkv",
+      "sha256": "2fd7f48841adb6ecc37e31856f2d616f50af79c988a37f63244826e5509d5b8a",
+      "extract": false
+    },
+    {
+      "name": "features",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T095722Z-14da4d11/full/published.tar",
+      "sha256": "994101c8d3466080777c262d92b9f15953c5636cc4addae06f75ad478d3594ee",
+      "extract": false
+    },
+    {
+      "name": "ordinary",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T104721Z-74428f3a/full/published.tar",
+      "sha256": "d8ca99d8afafc6ebe3ce790ee4cd08a67bc050962939559edfc87957423e1659",
+      "extract": false
+    },
+    {
+      "name": "carrier",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/rv102-paid-fdc8fcbb39599348/players.pscp",
+      "sha256": "3ebc2e455509db026919f17c17d2bfce3eba899fd29a0888c47440b576a219af",
+      "extract": false
+    },
+    {
+      "name": "yolo26x",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolo26x-pose.pt",
+      "sha256": "08ed9e01d22a6f248b04f2f9992016aca9a32250b9ab57057d886a09d026700d",
+      "extract": false
+    },
+    {
+      "name": "yolo26l",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolo26l-pose.pt",
+      "sha256": "ad33da8a29ea5772318c4c980844e47b56792d2b63815ad4e8e09c078c7d1abf",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match102-000-fc5d3ee431f8.mp4",
+      "sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/rv102-rgb-2fd7f48841adb6ec/source.mkv",
+      "sha256": "2fd7f48841adb6ecc37e31856f2d616f50af79c988a37f63244826e5509d5b8a"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T095722Z-14da4d11/full/published.tar",
+      "sha256": "994101c8d3466080777c262d92b9f15953c5636cc4addae06f75ad478d3594ee"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T104721Z-74428f3a/full/published.tar",
+      "sha256": "d8ca99d8afafc6ebe3ce790ee4cd08a67bc050962939559edfc87957423e1659"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/rv102-paid-fdc8fcbb39599348/players.pscp",
+      "sha256": "3ebc2e455509db026919f17c17d2bfce3eba899fd29a0888c47440b576a219af"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolo26x-pose.pt",
+      "sha256": "08ed9e01d22a6f248b04f2f9992016aca9a32250b9ab57057d886a09d026700d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolo26l-pose.pt",
+      "sha256": "ad33da8a29ea5772318c4c980844e47b56792d2b63815ad4e8e09c078c7d1abf"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "deadline": "2026-11-25T11:30:00Z",
+  "verify_staged_inputs": true,
+  "hosts": [
+    "gpu1",
+    "gpu4",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 28,
+  "smoke": {
+    "seconds": 300,
+    "representative_basis": "4 uniformly spaced Shanghai frames evaluating YOLO26x-pose on the exact 17.713 kbps ordinary-640-warm decode."
+  },
+  "full": {
+    "seconds": 1200
+  },
+  "validator_seconds": 30,
+  "budget_seconds": 1600,
+  "stall_seconds": 600,
+  "scale": {
+    "frames": {
+      "smoke": 4,
+      "full": 48
+    }
+  }
+}

@@ -102,6 +102,8 @@ V3 campus inventory verified on `gpu1.itec.aau.at`.
 - **Takeaways:** `dpm10_512_ov8_smooth` achieves **`3.27×` speedup** within `+0.0009` DISTS while cutting chunk-boundary `tLPIPS` seams by **`24.8%`** (`0.0792 -> 0.0596`, shrinking the seam-over-interior jump from `+44.3%` to `+5.3%`); `dpm6_512_ov4` reaches `5×` NFE reduction within `+0.0043` DISTS; naive correlated initial noise (`corr05`) degrades fidelity (`0.5610` DISTS).
 
 ### Track A1 / Halle / A3 / A4 / A6 Completion Receipts
+
+The next section supersedes the interim Halle and claim wording in this ledger.
 - **A1.2 Unmeasured TEST Court Audit (`20261124T112632Z-9732c726`, COMPLETE on `gpu5`):** `published.tar` sha256 `281a9f82dfb3d9fc1ac1c3295398466288a2aa05fa8425986a34e629f25fc66e` -> [a1-unmeasured-courts.json](a1-unmeasured-courts.json): **5/5 `court_eligible: True`** (`match107` 240/240 @ 60 fps, `match131` 228/240 @ 25 fps, `match104` 240/240 @ 60 fps, `match130` 240/240 @ 25 fps, `match126` 197/240 @ 25 fps). Companion `test_joint_features` attempts on `match107`/`match131` (`20261124T120458Z-672328b9`, `20261124T120746Z-9fe8835f`, `20261124T121814Z-3fbcbf68`) OOMed below `>= 26 GiB` (`sam3.1_multiplex.pt` peak `~24.8 GiB`).
 - **Halle `match105` Status:** Sender verified (`20261123T115652Z-1c5a006d`) & far player generated (`20261123T120635Z-5a1a9720`); prior near-player exclusive runs (`20261124T112312Z-7c3f01bf`, `20261124T210849Z-924b8f4b`) contended, `20261124T235423Z-61291fae` (`smoke=44`) hit `2680 s` forecast cap, `20261125T001028Z-a88734ca` (`--full-cap 3600`) violated `common_receiver_job.py` (`<=2700`), `20261125T001821Z-cc12a19c` (`smoke=64`, `gpu5` 97% contended) timed out at 550 s, and `20261125T003436Z-83275e97` (`smoke=64`, `gpu3` RTX A6000) failed smoke (`exit code 1`) under shared cluster contention; near-player synthesis stopped without further retry per budget rules. External baselines COMPLETE (`gpu2`): `20261124T235517Z-70597ed6` (`av1-640-280`, 13.70 kbps, `0.5744` DISTS, `22.81` dB -> [halle-score-av1-640-280.json](halle-score-av1-640-280.json)), `20261124T235624Z-f6db4a58` (`av1-640-160`, 123.98 kbps, `0.3058` DISTS, `26.62` dB -> [halle-score-av1-640-160.json](halle-score-av1-640-160.json)), `20261124T235708Z-b242a19d` (`av1-320-160`, 41.85 kbps, `0.4105` DISTS, `22.54` dB -> [halle-score-av1-320-160.json](halle-score-av1-320-160.json)), `20261124T235811Z-1a2c100e` (`dcvc-480-q24`, 12.15 kbps, `0.4671` DISTS, `23.32` dB -> [halle-score-dcvc-480-q24.json](halle-score-dcvc-480-q24.json)).
 - **A1.2 5-Match Pose Extension — COMPLETE (12/12 TEST Matches Measured, 0 Unmeasured):**
@@ -113,3 +115,30 @@ V3 campus inventory verified on `gpu1.itec.aau.at`.
 - **A6 Mode Selector & Amortization (12/12 Measured):** [a6-mode-selector-amortization.json](a6-mode-selector-amortization.json) (`warm_20.4`: 5 Conv / 0 Conv+Ball / 7 Full-Obj; `warm_26.0`: 1 Conv / 1 Conv+Ball / 10 Full-Obj; `cold_26.0`: 1 Conv / 11 Conv+Ball / 0 Full-Obj; `cold_200.0`: 1 Conv / 4 Conv+Ball / 7 Full-Obj).
 - **MIT Visual Plate & Supplementary Comparison Video:** `experiments/tennis/tomm_build_mit_media.py` (CPU on `gpu1`) built synchronized Sydney (`match127`, players t=115, ball t=68) & Shanghai (`match102`, t=95) crop plate (`external-native-crops.pdf` in manuscript) and `1920x1080` H.264 $2\times 2$ comparison video ([supplementary-comparison-mit.mp4](supplementary-comparison-mit.mp4), `3,709,191 B`).
 - **Cumulative GPU Budget Ledger:** ~2.5 GPU-h total spent against `6.0 GPU-h` cap (~0.92 V5 + ~0.55 Halle contended/smoke attempts + ~0.55 A1 5-match features/crop + ~0.48 prior smokes/tests).
+
+## Verified submission evidence
+
+- **Halle.** Near-player job `20261125T131927Z-2d59f826` completed on gpu6, and
+  the 240-tick receiver finished on gpu5 in `20261125T134808Z-6caa0351`.
+  [Receiver receipt](halle-match105-finish-summary.json) · [Common-ceiling
+  spatial scores](halle-joint-scores.json) · [Pose inference and direct
+  readout](halle-pose-machine-summary.json). The achieved rates were
+  15.27 kbps for Full-Obj, 13.98 for SVT-AV1, and 12.14 for DCVC-UF.
+- **Shanghai pose timing.** CPU job `20261125T071808Z-4ef2f004` found one
+  detection among 96 targets for 640-wide AV1 and reports a mean per-inference
+  time of 6.037 s. [Receipt](v7-shanghai-ordinary640-summary.json)
+- **Synthesis and Sydney ablations.** Jobs `20261125T075312Z-67505393` and
+  `20261125T082819Z-f14375d2` cover a shared-device 48-tick timing pilot and
+  24-tick Q90 and gap rendering controls. The spatial and temporal scores
+  use source-mask composites. The native receiver predicts masks from its
+  generated crops. [Timing](matched-checks-gpu-summary.json) ·
+  [Scores](matched-checks-scores.json)
+- **Cross-sport.** The 24-clip sender takes official projectile coordinates
+  and visibility as input. It wins on ball DISTS for 23/24 against same-width
+  AV1 and 21/24 against both saved AV1 controls. The second control chooses
+  the largest affordable file by bytes across the tested widths. The study
+  measures coding and rendering when tracks are given. [Badminton](a4-badminton-12.json) ·
+  [Table tennis](a4-tabletennis-12.json)
+- **Routing audit.** The twelve-match counts use official visibility,
+  measured court fit, potential pose coverage, and fixed cadence-based price
+  estimates. [Audit](a6-mode-selector-amortization.json)

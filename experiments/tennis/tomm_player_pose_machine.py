@@ -5,14 +5,17 @@ from __future__ import annotations
 import argparse
 from contextlib import ExitStack
 from fractions import Fraction
+import hashlib
 import json
 import os
 from pathlib import Path
 from statistics import mean
 import sys
+import tarfile
 import tempfile
 import time
 from typing import Any
+import zlib
 
 import cv2
 import numpy as np
@@ -154,13 +157,44 @@ def tight_box(mask: np.ndarray, offset: tuple[int, int]) -> tuple[int, int, int,
     return (int(xs.min()) + x0, int(ys.min()) + y0, int(xs.max()) + x0 + 1, int(ys.max()) + y0 + 1)
 
 
+def load_shanghai_ordinary640_arm(ordinary_tar: Path) -> dict[str, Any]:
+    """Load the 17.713 kbps Shanghai ordinary-640-warm encode from anchor manifest."""
+    scratch = Path(os.environ["PS_SCRATCH_DIR"])
+    anchor = json.loads((CARD.parent / "test102-joint-anchors-20261122/manifest.json").resolve().read_text())
+    row = next(r for r in anchor["rows"] if r["mode"] == "ordinary" and r["width"] == 640)
+    sel = row["selected"]["warm"]
+    assert sha256(ordinary_tar) == row["archive_sha256"]
+    with tarfile.open(ordinary_tar) as z:
+        f_ivf = z.extractfile(sel["file"])
+        f_raw = z.extractfile(sel["decoded_file"])
+        assert f_ivf is not None and f_raw is not None
+        ivf = f_ivf.read()
+        raw = zlib.decompress(f_raw.read())
+    assert hashlib.sha256(ivf).hexdigest() == sel["sha256"] and len(ivf) == sel["bytes"]
+    assert hashlib.sha256(raw).hexdigest() == sel["decoded_sha256"]
+    dest = scratch / "ordinary640.yuv"
+    dest.write_bytes(raw)
+    return dict(
+        name="av1-640-warm",
+        width=640,
+        height=row["height"],
+        kind="yuv",
+        bytes=sel["bytes"],
+        path=str(dest),
+        sha256=sel["decoded_sha256"],
+        decoded_sha256=sel["decoded_sha256"],
+    )
+
+
 def load_event_arms(args: argparse.Namespace) -> tuple[list[dict[str, Any]], list[tuple[Any, Any]], Fraction]:
     """Load matched arms, player support masks, and FPS for Shanghai or an extension event."""
     arms: list[dict[str, Any]] = []
     if args.event == "match102":
+        supports, _ = get_support(args.features)
+        if args.match102_ordinary640_only:
+            return [load_shanghai_ordinary640_arm(args.ordinary)], supports, FPS
         arms_path = load_shanghai_arms(args)
         arms = json.loads(arms_path.read_text())
-        supports, _ = get_support(args.features)
         return arms, supports, FPS
 
     b = json.loads((NATIVE_CARD / f"{args.event}-binding.json").read_text())
@@ -442,6 +476,7 @@ def main() -> None:
     p.add_argument("--ordinary-report-sha256")
     p.add_argument("--roi-report-sha256")
     p.add_argument("--neural-report-sha256")
+    p.add_argument("--match102-ordinary640-only", action="store_true")
     p.add_argument("--frames", type=int, choices=(4, 48), required=True)
     p.add_argument("--validate", action="store_true")
     if sys.argv[1:] == ["--validate"]:
