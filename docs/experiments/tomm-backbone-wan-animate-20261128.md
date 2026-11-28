@@ -104,4 +104,19 @@ Identical to `docs/experiments/tomm-multi-backbone-20261128.md` on Shanghai
 | Generation (attempt 3, failed) | `20261128T043027Z-0244070d` | `gpu6` (RTX 6000 Ada) | Failed (smoke) | `wan/__init__.py` eagerly imported `speech2video` (`librosa`); bypassed via package stub |
 | Generation (attempt 4, failed) | `20261128T043508Z-31a5f8cc` | `gpu6` (RTX 6000 Ada) | Failed (smoke) | All models loaded; `wan.modules.animate.clip` bound unpatched `flash_attention`; patched |
 | Generation (16f smoke + 48f full) | `20261128T043956Z-8aa56788` | `gpu6` (RTX 6000 Ada) | Complete | Exclusive RTX 6000 Ada (`timing_contaminated=false`, 15.0 min total, peak 36.5 GiB, 4,862 Flash SDPA calls, determinism diff=0, 465.51 s render); `published.tar` sha256 `93d6edfd...` |
-| Scoring (16f smoke + 48f full) | pending | CPU | Pending | `tomm_multi_backbone_score.py` |
+| Scoring (16f smoke + 48f full) | `20261128T045711Z-b59c7278` | `gpu5` (CPU) | Complete | 13.0 min (`elapsed_s=446.81`); verified receipt saved at `docs/experiments/tomm-backbone-wan-animate-20261128-scores.json` (`sha256: 5daf5b61...`) |
+
+## Verified Results (48 frames, 2 players, Shanghai `match102`, Exclusive RTX 6000 Ada)
+
+| Backbone (`Synthesize`) | Masked DISTS ↓ | Masked LPIPS ↓ | Masked PSNR (dB) ↑ | `self_flow_error` ↓ | `source_flow_error` ↓ | `tLPIPS` ↓ | `YOLO26x-pose` Recall@0.5 / OKS ↑ | Gen Time (s) ↓ | Speedup vs. DDIM-30 ↑ |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `wan_animate_14b` (Wan2.2-Animate-14B, 14B DiT, zero-shot, 20 DPM++ steps) | 0.3226 | 0.3525 | 12.12 | 17.79 | 26.50 | 0.0580 | 79.2% / 0.776 | 465.51 | 1.45× |
+
+- **Per-player masked DISTS:** `near_dists = 0.2960`, `far_dists = 0.3492`.
+- **Per-player render time:** `match102_near = 232.32 s` (`4.84 s/frame`), `match102_far = 233.19 s` (`4.86 s/frame`), total `465.51 s` (`4.85 s/player-frame`, `timing_contaminated = false`).
+- **Peak VRAM & kernels:** `37,382 MiB` allocated (`36.5 GiB`, `38,618 MiB` reserved) on exclusive `RTX 6000 Ada` (SM 8.9); `4,862` native `SDPBackend.FLASH_ATTENTION` calls + `320` face SDPA calls; smoke 5-frame determinism `max_abs_diff = 0`.
+- **Artifact identities:**
+  - Generation `published.tar`: `/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261128T043956Z-8aa56788/full/published.tar` (`sha256: 93d6edfd3af767997d63f4a6a73a88d26a851fd3f1219b9f7e8b3d54923fb5dc`)
+  - Scores JSON receipt: `docs/experiments/tomm-backbone-wan-animate-20261128-scores.json` (`sha256: 5daf5b618638c1c8cd3f069ff9e0bc02dcf58c52c58a2e4129ea643e77201b75`)
+
+**Decision & Takeaway:** Hypothesis confirmed. Zero-shot `Wan2.2-Animate-14B` consumes the exact frozen `PSCP` + `PSR` wire payload (`players.pscp`, sha256 `3ebc2e45...`) without protocol changes, outperforms both zero-shot 2D ControlNet-OpenPose + SD 1.5 (`0.3226` vs. `0.4019` DISTS; `0.0580` vs. `0.1120` tLPIPS) and non-generative `k6_ref_warp` (`0.3226` vs. `0.3346` DISTS; `0.776` vs. `0.744` OKS), and nearly matches tennis-adapted Moore-AnimateAnyone on temporal coherence (`17.79` vs. `17.51` `self_flow_error`, `0.0580` vs. `0.0571` `tLPIPS`) at `4.65×` the wall-clock render time (`465.51 s` vs. `100.11 s`, still `1.45×` faster than DDIM-30). Total GPU spend: ~0.25 GPU-hours (well under the 3.5 GPU-hour ceiling).
