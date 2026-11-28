@@ -36,4 +36,7 @@
 |---|---|---|---|---|
 | Stage 1 (48f pilot) | `20261128T040442Z-ee9d0597` | `gpu6` (CPU) | `failed` (smoke) | Determinism check caught unseeded `cv2.grabCut` RNG; fixed with `cv2.setRNGSeed(0)` |
 | Stage 1 (48f pilot, retry) | `20261128T040755Z-869c0567` | `gpu5` (CPU) | `failed` (validator) | Smoke passed & showed `v2_lbs_sam` 0.2898 / `v2_mls_sam` 0.2880 DISTS, `v2_lbs_warped_mask` 85.2 fps; missing `PS_VALIDATION_PATH` write |
-| Stage 1 (48f pilot, v2) | _pending_ | CPU | — | Fixed `PS_VALIDATION_PATH`, `reference_box` alignment, skeleton-core GrabCut |
+| Stage 1 (48f pilot, v2) | `20261128T041424Z-b872e14b` | `gpu2` (CPU) | `complete` | rev `5d160451`, receipt `docs/experiments/tomm-warp-v2-pilot-scores.json` (`6f389410`). **Promoted to Stage 2:** `v2_mls_sam` hit 0.3265 DISTS / 0.3496 LPIPS / **95.8% pose recall / 0.904 OKS**; `v2_mls_warped_mask` hit 0.3447 DISTS / 0.3994 LPIPS (beating DCVC-UF 0.431/0.471 & SVT-AV1 0.532/0.491); `v2_lbs_warped_mask` hit 31.0 fps total / 35.7 fps steady. |
+| Stage 2 (240f Shanghai) | _pending_ | CPU | — | `experiments.tennis.tomm_realtime_warp_native240 --event match102` (MLS `step=8`: `bgsub_alpha`, `psr_alpha`, `sam_oracle`) |
+| Stage 2 (240f Sydney) | _pending_ | CPU | — | `experiments.tennis.tomm_realtime_warp_native240 --event match127` |
+| Stage 2 (240f Halle) | _pending_ | CPU | — | `experiments.tennis.tomm_realtime_warp_native240 --event match105` |
