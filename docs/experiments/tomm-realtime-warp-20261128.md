@@ -37,6 +37,17 @@
 | Stage 1 (48f pilot) | `20261128T040442Z-ee9d0597` | `gpu6` (CPU) | `failed` (smoke) | Determinism check caught unseeded `cv2.grabCut` RNG; fixed with `cv2.setRNGSeed(0)` |
 | Stage 1 (48f pilot, retry) | `20261128T040755Z-869c0567` | `gpu5` (CPU) | `failed` (validator) | Smoke passed & showed `v2_lbs_sam` 0.2898 / `v2_mls_sam` 0.2880 DISTS, `v2_lbs_warped_mask` 85.2 fps; missing `PS_VALIDATION_PATH` write |
 | Stage 1 (48f pilot, v2) | `20261128T041424Z-b872e14b` | `gpu2` (CPU) | `complete` | rev `5d160451`, receipt `docs/experiments/tomm-warp-v2-pilot-scores.json` (`6f389410`). **Promoted to Stage 2:** `v2_mls_sam` hit 0.3265 DISTS / 0.3496 LPIPS / **95.8% pose recall / 0.904 OKS**; `v2_mls_warped_mask` hit 0.3447 DISTS / 0.3994 LPIPS (beating DCVC-UF 0.431/0.471 & SVT-AV1 0.532/0.491); `v2_lbs_warped_mask` hit 31.0 fps total / 35.7 fps steady. |
-| Stage 2 (240f Shanghai) | _pending_ | CPU | — | `experiments.tennis.tomm_realtime_warp_native240 --event match102` (MLS `step=8`: `bgsub_alpha`, `psr_alpha`, `sam_oracle`) |
-| Stage 2 (240f Sydney) | _pending_ | CPU | — | `experiments.tennis.tomm_realtime_warp_native240 --event match127` |
-| Stage 2 (240f Halle) | _pending_ | CPU | — | `experiments.tennis.tomm_realtime_warp_native240 --event match105` |
+| Stage 2 (240f Shanghai) | `20261128T044616Z-3c147248` | `gpu5` (CPU) | `complete` | rev `dc61f491`, receipt `docs/experiments/tomm-warp-native240-match102-scores.json` (`6e0705d5`): `bgsub_alpha` **0.3536 DISTS / 0.4260 LPIPS / 52.1% pose recall at 30.8 fps e2e** (40.3 fps synth, 15.48 kbps warm); `psr_alpha` 0.3527 DISTS (+905 B); `sam_oracle` 0.3434 DISTS (83.3% recall) |
+| Stage 2 (240f Sydney) | `20261128T044711Z-1fe56719` | `gpu3` (CPU) | `complete` | rev `dc61f491`, receipt `docs/experiments/tomm-warp-native240-match127-scores.json` (`ebb9292c`): `bgsub_alpha` **0.3538 DISTS / 0.3597 LPIPS / 41.7% pose recall at 29.9 fps e2e** (34.4 fps synth, 21.41 kbps warm); `psr_alpha` 0.3517 DISTS (+677 B); `sam_oracle` 0.3154 DISTS (66.7% recall) |
+| Stage 2 (240f Halle) | `20261128T044853Z-cda34076` | `gpu1` (CPU) | `complete` | rev `dc61f491`, receipt `docs/experiments/tomm-warp-native240-match105-scores.json` (`672c2964`): `bgsub_alpha` **0.3425 DISTS / 0.3934 LPIPS / 52.1% pose recall at 27.0 fps e2e** (32.2 fps synth, 13.38 kbps warm); `psr_alpha` 0.3325 DISTS (+849 B); `sam_oracle` 0.3220 DISTS (58.3% recall) |
+
+## Final Outcome (0.00 GPU-hours spent)
+
+All three 240-frame unadapted external broadcasts (**1,440 player-frames total**) completed on 1 CPU thread with **0 GPU-hours**, **0 SAM 3.1 receiver calls**, and **0 extra wire bytes** (`mls_step8_bgsub_alpha`):
+
+| Match (fps) | Warm kbps | `bgsub_alpha` DISTS / LPIPS | `psr_alpha` DISTS (+kbps) | `sam_oracle` DISTS | SVT-AV1 Player DISTS | DCVC-UF Player DISTS | PointStream-AA (GPU) DISTS | 1-CPU-Thread FPS (e2e / synth) |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Shanghai (`match102`, 29.97 fps) | 15.48 | **0.3536** / 0.4260 | 0.3527 (+0.90) | 0.3434 | 0.524 | 0.438 | 0.319 | **30.8** / 40.3 |
+| Sydney (`match127`, 60 fps) | 21.41 | **0.3538** / 0.3597 | 0.3517 (+1.35) | 0.3154 | 0.493 | — | 0.289 | **29.9** / 34.4 |
+| Halle (`match105`, 25 fps) | 13.38 | **0.3425** / 0.3934 | 0.3325 (+0.71) | 0.3220 | 0.542 | 0.467 | 0.310 | **27.0** / 32.2 |
+| **3-Match Mean** | **16.76** | **0.3500** / 0.3930 | **0.3456** | **0.3269** | **0.520** | — | **0.306** | **29.2** / 35.6 |
