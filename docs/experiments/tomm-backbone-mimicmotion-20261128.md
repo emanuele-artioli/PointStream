@@ -89,5 +89,5 @@ Audited on `gpu5` (2026-11-28):
 | Stage | Job ID | Host / GPU | Status | Notes |
 |---|---|---|---|---|
 | Generation (attempt 1, failed) | `20261128T083057Z-6927b7a1` | `gpu6` (RTX 6000 Ada) | Failed (smoke) | Passed `device="cuda"` string instead of `torch.device("cuda")` to `MimicMotionPipeline` |
-| Generation (attempt 2, 16f smoke + 48f full) | _pending_ | `gpu5`/`gpu6` (RTX 6000 Ada) | Pending | Exclusive RTX 6000 Ada |
+| Generation (attempt 2, 16f smoke + 48f full) | `20261128T083407Z-ef6a49a4` | `gpu6` (RTX 6000 Ada) | Complete | Exclusive RTX 6000 Ada (`timing_contaminated=false`, 4.6 min, peak 7.4 GiB); `published.tar` sha256 `baac6de9...` |
 | Scoring (16f smoke + 48f full) | _pending_ | CPU | Pending | `experiments.tennis.tomm_multi_backbone_score` |
